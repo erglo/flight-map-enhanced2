@@ -220,7 +220,7 @@ function ns:initft()
 		--register events we need
 		module.frame:RegisterEvent("PLAYER_CONTROL_LOST");
 		nosaving = false;
-		
+		--print("nosavingfalse");
 		--orig_taketaxinode(wn);
 	end
 	
@@ -335,7 +335,7 @@ function ns:initft()
 		module.frame:SetScript("OnUpdate",function (self,elapsed)
 			delaytime=delaytime+elapsed;
 			if(delaytime>5) then
-				if(IsInInstance()==nil and nosaving==false) then
+				if(IsInInstance()==false and nosaving==false) then
 					module:saveaccurate();
 					module:savehop();
 					--print("saving");
@@ -434,7 +434,7 @@ function ns:initft()
 		
 			--print(timer.."-"..curspeed);
 		elseif(event=="PLAYER_CONTROL_GAINED") then
-		
+			--print("gelandet");
 			module:FlightTimerOff()
 			module:timeroff();
 			module:delaytimer();
@@ -445,6 +445,7 @@ function ns:initft()
 			--self:UnregisterEvent("PLAYER_ENTERING_WORLD");
 		elseif(event=="UNIT_FLAGS") then
 			if(UnitOnTaxi("player")) then
+				--print("ontaxt");
 				flystart = time();
 				module:timeron();
 				self:RegisterEvent("PLAYER_CONTROL_GAINED");
@@ -456,6 +457,7 @@ function ns:initft()
 						self:RegisterEvent("PLAYER_MONEY"); --figure when a flight path is passed
 					end
 				else
+					--print("ja1");
 					nosaving = true; 
 				end
 				needspeed = true; --somehow sometimes the speed is not known here yet so delaying it
@@ -469,6 +471,7 @@ function ns:initft()
 			module:FlightTimerOff()
 			module:stoptracking();
 		elseif(event=="PLAYER_ENTERING_WORLD") then
+			--print("ja2");
 			nosaving = true;
 			self:UnregisterEvent("PLAYER_ENTERING_WORLD");
 		end

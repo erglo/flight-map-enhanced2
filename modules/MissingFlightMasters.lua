@@ -42,6 +42,7 @@ function ns:initmfm()
 						if not (missing[v2.cont][i]) then missing[v2.cont][i] = {} end
 						
 						if(ns.flocdis.count[v2.cont]>0) then
+							--print(i2);
 							tinsert(missing[v2.cont][i],{["x"]=v2.x,["y"]=v2.y});
 						end
 						c=c+1;					

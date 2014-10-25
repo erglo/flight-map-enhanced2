@@ -47,6 +47,20 @@ function ns:configchange(version,newversion)
 		if(version<10) then
 			FlightMapEnhanced_Config["discovery"]["count"][6] = 0;
 		end
+		if(version<11) then
+			FlightMapEnhanced_Config["discovery"]["count"][6] = 0;
+			FlightMapEnhanced_Config["fps"][6]=nil;
+			for i,_ in pairs(FlightMapEnhanced_Config["discovery"]) do
+				if(i ~= "count") then
+					if(i > 60000) then
+						FlightMapEnhanced_Config["discovery"][i] = nil;
+					end
+				end
+			
+			end
+		
+		end
+		
 		FlightMapEnhanced_Config.vconf.version = newversion;
 end
 
@@ -74,5 +88,19 @@ function ns:gconfigchange(newversion)
 			FlightMapEnhanced_FlightNames["count"][6] = 0;
 			
 		end
+		if(ns.gconf.version<7) then
+			FlightMapEnhanced_FlightNames["count"][6] = 0;
+			FlightMapEnhanced_FlightLocations = {}
+			FlightMapEnhanced_FlightTimes = {}
+			for i,_ in pairs(FlightMapEnhanced_FlightNames) do
+				if(i ~= "count") then
+					if(i > 60000) then
+						FlightMapEnhanced_FlightNames[i] = nil;
+					end
+				end
+			
+			end
+		end
+		
 		ns.gconf.version = newversion;
 end
