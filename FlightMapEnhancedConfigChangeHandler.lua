@@ -101,6 +101,9 @@ function ns:gconfigchange(newversion)
 			
 			end
 		end
-		
+		if(ns.gconf.version<8) then
+			FlightMapEnhanced_FlightNames["count"][7] = 0;
+			
+		end
 		ns.gconf.version = newversion;
 end
