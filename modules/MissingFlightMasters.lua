@@ -24,7 +24,7 @@ function ns:initmfm()
 		local dis = FlightMapEnhanced_Config.discovery;
 		local faction =  UnitFactionGroup("player");
 		local missingcont = false;
-		for i=1,6 do
+		for i=1,7 do
 			if i ~= 5 then
 				missing[i] = {};
 				if(ns.flocdis.count[i]==0) then
