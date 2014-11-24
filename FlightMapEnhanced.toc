@@ -1,7 +1,7 @@
 ## Interface: 60000
 ## Title: Flight Map Enhanced
 ## Author: Dorwido
-## Version: 1.5.42
+## Version: 1.5.43
 ## Notes: Enhances the normal Flight Map with adding a list to choose where you want to fly.
 ## SavedVariables: FlightMapEnhanced_FlightLocations, FlightMapEnhanced_FlightNames, FlightMapEnhanced_FlightTimes, FlightMapEnhanced_GlobalConf
 ## SavedVariablesPerCharacter: FlightMapEnhanced_Config
