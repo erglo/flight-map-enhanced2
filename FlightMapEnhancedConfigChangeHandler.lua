@@ -60,6 +60,14 @@ function ns:configchange(version,newversion)
 			end
 		
 		end
+		if(version<12) then
+			if not(FlightMapEnhanced_Config["discovery"]["count"][7]) then
+				FlightMapEnhanced_Config["discovery"]["count"][7] =0;
+			
+			end
+			
+		
+		end
 		
 		FlightMapEnhanced_Config.vconf.version = newversion;
 end

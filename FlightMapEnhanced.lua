@@ -675,11 +675,13 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 			if not(FlightMapEnhanced_Config.vconf.module) then
 				FlightMapEnhanced_Config.vconf.module = {};
 			end
+			
 			ns:LoadModules();
+			
 			if not(FlightMapEnhanced_Config.vconf.version) then
-				ns:configchange(0,11);
-			elseif(FlightMapEnhanced_Config.vconf.version<11) then
-				ns:configchange(FlightMapEnhanced_Config.vconf.version,11);
+				ns:configchange(0,12);
+			elseif(FlightMapEnhanced_Config.vconf.version<12) then
+				ns:configchange(FlightMapEnhanced_Config.vconf.version,12);
 			end
 			ns.configchange = nil;
 			if(ns.gconf.version < 8) then

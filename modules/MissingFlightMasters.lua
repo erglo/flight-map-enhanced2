@@ -36,11 +36,14 @@ function ns:initmfm()
 		
 		for i,v in pairs (ns.floc) do
 			for i2,v2 in pairs(v) do
+				
 				if(dis[i2] == nil and i2~=26366 and i2~=37815 and i2~=38123 and i2~=24863) then --26366 is the dk only one skip it, skip also aldor/scryer can only have one and work arround would be quite some work and not really worht it
 					if(faction == v2.faction or v2.faction == "Neutral") then
 						
 						if not (missing[v2.cont][i]) then missing[v2.cont][i] = {} end
-						
+						if not(ns.flocdis.count[v2.cont]) then
+							break;
+						end
 						if(ns.flocdis.count[v2.cont]>0) then
 							--print(i2);
 							
