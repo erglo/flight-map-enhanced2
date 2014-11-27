@@ -6,7 +6,7 @@ function ns:initmfm()
 	local L = ns.L;
 	local missing = {};
 	local missing_pointers = {};
-	local showconts = {[485]=4,[13]=1,[14]=2,[466]=3}
+	local showconts = {[485]=4,[13]=1,[14]=2,[466]=3,[862]=6,[962]=7}
 	local current = 1;
 	
 
@@ -43,6 +43,7 @@ function ns:initmfm()
 						
 						if(ns.flocdis.count[v2.cont]>0) then
 							--print(i2);
+							
 							tinsert(missing[v2.cont][i],{["x"]=v2.x,["y"]=v2.y});
 						end
 						c=c+1;					
@@ -106,18 +107,23 @@ function ns:initmfm()
 	function module:onevent(event,...)
 		if(event=="WORLD_MAP_UPDATE") then
 			local curcont = GetCurrentMapContinent(); 
-			if(WorldMapFrame:IsVisible() and curcont~=-1 and curcont<7 and curcont~=5) then
+			
+			if(WorldMapFrame:IsVisible() and curcont~=-1 and curcont<8 and curcont~=5) then
 				module:hideall();
 				local curmapid = GetCurrentMapAreaID();
+				
 				if(curcont==0) then
 					module:ShowContinent(1,20);
 					module:ShowContinent(2,20);
 					module:ShowContinent(4,20);
 					module:ShowContinent(6,20);
+					
 				elseif(showconts[curmapid]) then
+					
 					module:ShowContinent(showconts[curmapid],25);
 				else
 					module:ShowZone(curcont,curmapid);
+					
 				end
 			else
 				module:hideall();
