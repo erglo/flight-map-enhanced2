@@ -3,3 +3,7 @@ if ( GetLocale() ~= "ptBR" ) then
 end
 local ns = select( 2, ... );
 ns.L = --@localization(locale="ptBR", format="lua_table", handle-unlocalized="english")@
+
+--@debug@ 
+{}
+--@end-debug@

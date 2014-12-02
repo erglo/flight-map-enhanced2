@@ -3,3 +3,7 @@ if ( GetLocale() ~= "esMX" ) then
 end
 local ns = select( 2, ... );
 ns.L = --@localization(locale="esMX", format="lua_table", handle-unlocalized="english")@
+
+--@debug@ 
+{}
+--@end-debug@

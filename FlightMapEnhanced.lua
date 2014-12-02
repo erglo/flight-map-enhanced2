@@ -496,10 +496,20 @@ function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
 				if((v2["faction"]==side or v2["faction"]=="Neutral") and v2["cont"]==mapcont and flocdis[i2]==1  ) then
 					--print(ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y));
 					--old local dist = CalcDist(coordx,value.x,coordy,value.y);
+					--print (mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
 					local dist = ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
-					if(dist<closest) then
-						closest = dist;
-						flyto={["name"]=flocn[i2],["mapid"]=index,["x"]=v2.x,["y"]=v2.y};
+					--print ("c:"..closest);
+					--print ("-");
+					--print(dist);
+					if(dist==nil) then
+						--print (mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
+					
+					else
+					
+						if(dist<closest) then
+							closest = dist;
+							flyto={["name"]=flocn[i2],["mapid"]=index,["x"]=v2.x,["y"]=v2.y};
+						end
 					end
 				end
 			end
