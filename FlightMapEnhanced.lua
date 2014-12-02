@@ -694,8 +694,8 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 				ns:configchange(FlightMapEnhanced_Config.vconf.version,12);
 			end
 			ns.configchange = nil;
-			if(ns.gconf.version < 8) then
-				ns:gconfigchange(8);
+			if(ns.gconf.version < 9) then
+				ns:gconfigchange(9);
 			end
 			ns.gconfigchange = nil;
 			collectgarbage();

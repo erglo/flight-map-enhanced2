@@ -113,5 +113,13 @@ function ns:gconfigchange(newversion)
 			FlightMapEnhanced_FlightNames["count"][7] = 0;
 			
 		end
+		if(ns.gconf.version<9) then
+			for k,v in pairs(FlightMapEnhanced_FlightTimes) do
+				if(type(v) == "table") then
+					FlightMapEnhanced_FlightTimes[k] = nil;
+				end
+			end
+			
+		end
 		ns.gconf.version = newversion;
 end

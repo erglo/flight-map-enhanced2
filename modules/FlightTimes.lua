@@ -120,6 +120,8 @@ function ns:initft()
 	end
 	
 	function module:taketaxinode(wn)
+		flyend=0;
+		
 		dotracking = false;
 		--if(options.fasttrack) then
 			local numroutes = GetNumRoutes(wn);
@@ -179,7 +181,9 @@ function ns:initft()
 					else
 						ft_timeid = flight_route[i].."|"..flight_route[i+1];
 					end
+					--temporary track always
 					if not(f_times[ft_timeid]) then
+						--print("fasttrack");
 						dotracking=true;
 					end
 				end
@@ -209,7 +213,7 @@ function ns:initft()
 			--print("jo");
 			--flight_route_accurate = sflid.."-"..dflid;
 			if not(f_times[flight_route_accurate]) then
-				--print("tracking accurate");
+				print("tracking accurate");
 				dotracking=true;
 			end
 		else
@@ -378,7 +382,8 @@ function ns:initft()
 		if(options.accurate) then
 			if(flight_route_accurate=='') then return; end
 			if(not f_times[flight_route_accurate]) then
-				local timetook = flyend - flystart;				
+				local timetook = flyend - flystart;		
+				print("saving accurate"..timetook);
 				s_f_times[flight_route_accurate] = timetook;
 				f_times[flight_route_accurate] = timetook;
 			end
@@ -386,8 +391,12 @@ function ns:initft()
 	end
 	
 	function module:savehop()
+		--print("trying to save");
+		--print(curspeed);
 		if(options.fasttrack and nofastrack~=true) then
+			--print("trying to save2");
 			if(flight_route[curhop]~=-1 and flight_route[curhop+1]~=-1) then
+				--print("trying to save3");
 				local ft_timeid;
 				--lower id always first
 				if(flight_route[curhop]>flight_route[curhop+1]) then
@@ -398,11 +407,15 @@ function ns:initft()
 				if(not f_times[ft_timeid]) then
 					local timetook;
 					if(flyend==0) then
+						--print("using method a");
 						timetook = time() - flystart;
 					else
+						
+						--print("using method b");
+						--print(flyend);
 						timetook = flyend - flystart;
 					end
-					
+					--print (timetook);
 					
 					s_f_times[ft_timeid] = {["speed"]=curspeed,["ftime"]=timetook};
 					f_times[ft_timeid] = {["speed"]=curspeed,["ftime"]=timetook};
