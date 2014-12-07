@@ -213,7 +213,7 @@ function ns:initft()
 			--print("jo");
 			--flight_route_accurate = sflid.."-"..dflid;
 			if not(f_times[flight_route_accurate]) then
-				print("tracking accurate");
+				--print("tracking accurate");
 				dotracking=true;
 			end
 		else
@@ -383,7 +383,7 @@ function ns:initft()
 			if(flight_route_accurate=='') then return; end
 			if(not f_times[flight_route_accurate]) then
 				local timetook = flyend - flystart;		
-				print("saving accurate"..timetook);
+				--print("saving accurate"..timetook);
 				s_f_times[flight_route_accurate] = timetook;
 				f_times[flight_route_accurate] = timetook;
 			end

@@ -402,7 +402,9 @@ function FlightMapEnhanced_CreateFlyPathTable()
 		tmptaxinode[runs].name = key;
 		tmptaxinode[runs].isheader = true;
 		tmptaxinode[runs].flightid = 0;
-		if (not FlightMapEnhanced_Config.notexpanded[key] and (FlightMapEnhanced_Config.alwayscollapse==nil or firstshow == false)) then
+		
+		if (not FlightMapEnhanced_Config.notexpanded[key] and ((FlightMapEnhanced_Config.alwayscollapse==nil or FlightMapEnhanced_Config.alwayscollapse==false  ) or firstshow == false)) then
+			
 			tmptaxinode[runs].isexpanded = true;
 			runs=runs+1;
 			for key2, val2 in pairsByKeys(val) do
