@@ -15,6 +15,7 @@ function ns:initft()
 	local dotracking;
 	local flystart = 0;
 	local flyend = 0;
+	local missingidshown = false;
 
 	local function CalcFlId(x,y,z)
 		local flid=tonumber(z..ceil(x*100)..ceil(y*100));
@@ -84,7 +85,10 @@ function ns:initft()
 					else
 						--not having the flid so insert -1
 						aflidgen = false;
-						print(L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+						if(missingidshown==false) then
+							missingidshown = true;
+							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+						end
 			
 					end
 				end
@@ -106,7 +110,10 @@ function ns:initft()
 					end
 					
 				else
-					print(L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+					if(missingidshown==false) then
+						missingidshown = true;
+						print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+					end
 					aflidgen = false;
 				end
 			
@@ -148,7 +155,11 @@ function ns:initft()
 					else
 						--not having the flid so insert -1
 						aflidgen = false;
-						print(L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+						if(missingidshown==false) then
+							missingidshown = true;
+							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+						end
+						
 						tinsert(flight_route,-1);
 					end
 				end
@@ -169,7 +180,10 @@ function ns:initft()
 					end
 					
 				else
-					print(L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+					if(missingidshown==false) then
+							missingidshown = true;
+							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+						end
 					aflidgen = false;
 					tinsert(flight_route,-1);
 				end
