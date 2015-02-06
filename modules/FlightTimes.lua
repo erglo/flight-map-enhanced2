@@ -69,7 +69,18 @@ function ns:initft()
 			local aflidgen = true;
 			flight_route_accurate = '';
 			for i=1, numroutes do
+				--print(TaxiNodeName(wn));
+				
 				if(i==1) then
+					if(TaxiNodeName(wn)=="Socrethar's Rise, Shadowmoon Valley") then
+					
+					sX = TaxiGetSrcX(wn, i);
+					sY = TaxiGetSrcY(wn, i);
+					flid = CalcFlId(sX,sY,GetCurrentMapContinent())
+					print(flid);
+				
+				end
+					
 					sX = TaxiGetSrcX(wn, i);
 					sY = TaxiGetSrcY(wn, i);
 					flid = CalcFlId(sX,sY,GetCurrentMapContinent())
@@ -87,7 +98,9 @@ function ns:initft()
 						aflidgen = false;
 						if(missingidshown==false) then
 							missingidshown = true;
-							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+							
+							
+							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2..":"..TaxiNodeName(wn));
 						end
 			
 					end
@@ -112,7 +125,7 @@ function ns:initft()
 				else
 					if(missingidshown==false) then
 						missingidshown = true;
-						print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+						print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2..":"..TaxiNodeName(wn));
 					end
 					aflidgen = false;
 				end
@@ -157,7 +170,7 @@ function ns:initft()
 						aflidgen = false;
 						if(missingidshown==false) then
 							missingidshown = true;
-							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2..":"..TaxiNodeName(wn));
 						end
 						
 						tinsert(flight_route,-1);
@@ -182,7 +195,7 @@ function ns:initft()
 				else
 					if(missingidshown==false) then
 							missingidshown = true;
-							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2);
+							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2..":"..TaxiNodeName(wn));
 						end
 					aflidgen = false;
 					tinsert(flight_route,-1);
