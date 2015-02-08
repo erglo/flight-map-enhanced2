@@ -10,7 +10,7 @@ function ns:initft()
 	local f_times,s_f_times;
 	local flight_route={};
 	local timer,totaltimer,curhop,curspeed,needspeed,flight_route_accurate,nofastrack,startname,endname,lasttimer,timeleft,nosaving;
-	local remapid = {[45665]=45664}; --argent van guard
+	local remapid = {[45665]=45664,[76678]=76679}; --argent van guard --everbloom overlook
 	local options;
 	local dotracking;
 	local flystart = 0;
@@ -19,6 +19,7 @@ function ns:initft()
 
 	local function CalcFlId(x,y,z)
 		local flid=tonumber(z..ceil(x*100)..ceil(y*100));
+		--print(flid);
 		if(remapid[flid]) then
 			return remapid[flid];
 		else
@@ -72,14 +73,14 @@ function ns:initft()
 				--print(TaxiNodeName(wn));
 				
 				if(i==1) then
-					if(TaxiNodeName(wn)=="Socrethar's Rise, Shadowmoon Valley") then
-					
-					sX = TaxiGetSrcX(wn, i);
-					sY = TaxiGetSrcY(wn, i);
-					flid = CalcFlId(sX,sY,GetCurrentMapContinent())
-					print(flid);
+				--	if(TaxiNodeName(wn)=="Socrethar's Rise, Shadowmoon Valley") then
+				--	
+				--	sX = TaxiGetSrcX(wn, i);
+			--		sY = TaxiGetSrcY(wn, i);
+			--		flid = CalcFlId(sX,sY,GetCurrentMapContinent())
+			--		print(flid);
 				
-				end
+			--	end
 					
 					sX = TaxiGetSrcX(wn, i);
 					sY = TaxiGetSrcY(wn, i);
@@ -100,7 +101,7 @@ function ns:initft()
 							missingidshown = true;
 							
 							
-							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2..":"..TaxiNodeName(wn));
+							module:printchangeid(flid,TaxiNodeName(wn));
 						end
 			
 					end
@@ -125,7 +126,7 @@ function ns:initft()
 				else
 					if(missingidshown==false) then
 						missingidshown = true;
-						print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2..":"..TaxiNodeName(wn));
+						module:printchangeid(flid,TaxiNodeName(wn));
 					end
 					aflidgen = false;
 				end
@@ -137,6 +138,23 @@ function ns:initft()
 			GameTooltip:AddLine("Flight time: "..mins.."m"..secs.."s", 1.0, 1.0, 1.0);
 		end	
 			
+	end
+	
+	function module:printchangeid(newid,nodename)
+		local match1,_ = strmatch(nodename,"^(.*),(.*)");
+		
+		local oldid = 0;
+		for k,v in pairs(ns.flocn) do
+			if v == match1 then
+				oldid = k;
+				break
+			end
+		end
+		
+		if(oldid>0) then
+			print("Flight Map Enhanced: "..string.format(L.FT_CANNOT_FIND_ID_NEW,nodename,oldid,newid))
+		end
+	
 	end
 	
 	function module:taketaxinode(wn)
@@ -170,7 +188,7 @@ function ns:initft()
 						aflidgen = false;
 						if(missingidshown==false) then
 							missingidshown = true;
-							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2..":"..TaxiNodeName(wn));
+							module:printchangeid(flid,TaxiNodeName(wn));
 						end
 						
 						tinsert(flight_route,-1);
@@ -194,9 +212,9 @@ function ns:initft()
 					
 				else
 					if(missingidshown==false) then
-							missingidshown = true;
-							print("Flight Map Enhanced: "..L.FT_CANNOT_FIND_ID..": "..flid..". "..L.FT_CANNOT_FIND_ID2..":"..TaxiNodeName(wn));
-						end
+						missingidshown = true;
+						module:printchangeid(flid,TaxiNodeName(wn));
+					end
 					aflidgen = false;
 					tinsert(flight_route,-1);
 				end

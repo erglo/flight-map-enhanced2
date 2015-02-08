@@ -261,6 +261,7 @@ end
 
 --to be removed after alpha
 local function checkifdiscovered(fid)
+
 	for index,value in pairs(floc) do
 		for index2,value2 in pairs(value) do
 			if(index2==fid) then
@@ -268,6 +269,7 @@ local function checkifdiscovered(fid)
 			end
 		end
 	end
+	
 	return false;
 end
 

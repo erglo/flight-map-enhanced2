@@ -49,6 +49,7 @@ ns.L = {
 	FT_SECOND_SHORT = "s",
 	FT_CANNOT_FIND_ID = "Cannot find the following id",
 	FT_CANNOT_FIND_ID2 = "Please report this id",
+	FT_CANNOT_FIND_ID_NEW = "Cannot find %s , old id is %s and new id is %s, please report this.",
 	CONFIG_CONFIRM_FLIGHT_AUTO = "Confirm before a flight is automatic taken",
 	CONFIG_CONFIRM_FLIGHT_MANUAL = "Confirm before a flight is manually taken",
 	CONFIRM_FLIGHT = "You really wanna flight to %s ?",

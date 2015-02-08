@@ -68,6 +68,7 @@ function ns:configchange(version,newversion)
 			
 		
 		end
+			
 		
 		FlightMapEnhanced_Config.vconf.version = newversion;
 end
@@ -121,5 +122,6 @@ function ns:gconfigchange(newversion)
 			end
 			
 		end
+		
 		ns.gconf.version = newversion;
 end
