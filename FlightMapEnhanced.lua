@@ -296,6 +296,25 @@ local function tcount(tab)
    end
    return n
  end
+ 
+local function clear_discoverd(curcont)
+	flocn["count"][curcont] = 0;
+	for i,_ in pairs(FlightMapEnhanced_Config["discovery"]) do
+		if(i~="count") then
+			if(math.floor(i/10000)==curcont) then
+				FlightMapEnhanced_Config["discovery"][i] = nil;
+			end
+			
+		end
+			--if(i > curcont*10000) then
+			--	FlightMapEnhanced_Config["discovery"][i] = nil;
+			--end
+		
+			
+	end
+
+
+end
 
 function FlightMapEnhanced_CreateFlyPathTable()
 	local takeflight=0;
@@ -328,6 +347,7 @@ function FlightMapEnhanced_CreateFlyPathTable()
 		updatediscovered = true;
 		--print("updating known flight path locations");
 	end
+	clear_discoverd(curcont);
 	for i=1,numtaxis do
 		
 		local match1,match2 = strmatch(TaxiNodeName(i),"^(.*),(.*)");
@@ -337,19 +357,26 @@ function FlightMapEnhanced_CreateFlyPathTable()
 		end
 		match1=strtrim(match1);
 		match2=strtrim(match2);
-		if(updatenames == true or updatediscovered== true) then
-			local tx,ty = TaxiNodePosition(i);
-			local flid = CalcFlId(tx,ty,curcont);
-			if(updatenames == true) then
-				if not(flocn[flid]) then
-					flocn[flid] = match1;
-					flocn["count"][curcont] = flocn["count"][curcont] +1;
+		--temp always update this on flightmaster to iron out a bug which 6.1 brought showing all flight master as available in the list not discovered = distant
+		if(true or updatenames == true or updatediscovered== true) then
+			
+			if (TaxiNodeGetType(i)~='DISTANT') then
+				
+				local tx,ty = TaxiNodePosition(i);
+				local flid = CalcFlId(tx,ty,curcont);
+				--print (flid)
+				--print (match1)
+				if(updatenames == true or true) then
+					if not(flocn[flid]) then
+						flocn[flid] = match1;
+						flocn["count"][curcont] = flocn["count"][curcont] +1;
+					end
 				end
-			end
-			if(updatediscovered==true) then
-			   if not(flocdis[flid]) then
-				flocdis[flid] = 1;
-			   end
+				if(updatediscovered==true or true) then
+				   if not(flocdis[flid]) then
+					flocdis[flid] = 1;
+				   end
+				end
 			end
 		end
 		
@@ -452,25 +479,28 @@ end
 function FlightMapEnhanced_AlterFlightPaths()
 	
 	local a = ns:GetPlayerData();
-	if(FlightMapEnhanced_Config.fps[a] ) then
-		if(NumTaxiNodes()==FlightMapEnhanced_Config.fps[a].total) then
-			return
-		end
-	end
+	--if(FlightMapEnhanced_Config.fps[a] ) then
+	--	if(NumTaxiNodes()==FlightMapEnhanced_Config.fps[a].total) then
+	--		return
+	--	end
+	--end
 	local tmptaxinode,tmptaxinode2 = {},{};
 	FlightMapEnhanced_Config.fps[a] = {};
 	for i=1,NumTaxiNodes() do
-		local match1,match2 = strmatch(TaxiNodeName(i),"^(.*),(.*)");
-		if(match2 == nil) then --zone and subzone same name kinda in captials
-			match1 = TaxiNodeName(i);
-			match2 = TaxiNodeName(i);
+		
+		if (TaxiNodeGetType(i)~='DISTANT') then
+			local match1,match2 = strmatch(TaxiNodeName(i),"^(.*),(.*)");
+			if(match2 == nil) then --zone and subzone same name kinda in captials
+				match1 = TaxiNodeName(i);
+				match2 = TaxiNodeName(i);
+			end
+			match1=strtrim(match1);
+			match2=strtrim(match2);
+			if not (tmptaxinode2[match2]) then
+				tmptaxinode2[match2] = {};
+			end
+			tmptaxinode2[match2][match1] = i;
 		end
-		match1=strtrim(match1);
-		match2=strtrim(match2);
-		if not (tmptaxinode2[match2]) then
-			tmptaxinode2[match2] = {};
-		end
-		tmptaxinode2[match2][match1] = i;
 	end
 
 	FlightMapEnhanced_Config.fps[a] = tmptaxinode2;
