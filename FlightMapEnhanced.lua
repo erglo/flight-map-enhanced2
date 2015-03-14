@@ -557,6 +557,48 @@ function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
 	end
 end
 
+function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
+
+	--if not (floc[mapareaid]) then
+	--	print(L.NO_FLIGHT_LOCATIONS_KNOWN);
+	if(flocdis["count"][mapcont] == 0) then
+		print(L.NEED_VISIT_FLIGHT_MASTER);
+	else
+		local closest = 100000;
+		local flyto={};
+		--old for index,value in pairs(floc[mapareaid]) do
+		for index,value in pairs(floc) do
+			for i2,v2 in pairs(value) do
+				if((v2["faction"]==side or v2["faction"]=="Neutral") and v2["cont"]==mapcont and flocdis[i2]==1  ) then
+					--print(ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y));
+					--old local dist = CalcDist(coordx,value.x,coordy,value.y);
+					--print (mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
+					local dist = ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
+					--print ("c:"..closest);
+					--print ("-");
+					--print(dist);
+					if(dist==nil) then
+						--print (mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
+					
+					else
+					
+						if(dist<closest) then
+							closest = dist;
+							flyto={["name"]=flocn[i2],["mapid"]=index,["x"]=v2.x,["y"]=v2.y,["dist"]=dist};
+						end
+					end
+				end
+			end
+		end
+		if(flyto~="") then
+			return flyto;
+		else
+			print(L.NO_FLIGHT_LOCATIONS_KNOWN);
+		end
+		
+	end
+end
+
 function FlightMapEnhanced_SetNextFlyByID(id)
 	FlightMapEnhanced_SetNextFly(flocn[id]);
 
@@ -728,8 +770,8 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 				ns:configchange(FlightMapEnhanced_Config.vconf.version,12);
 			end
 			ns.configchange = nil;
-			if(ns.gconf.version < 9) then
-				ns:gconfigchange(9);
+			if(ns.gconf.version < 10) then
+				ns:gconfigchange(10);
 			end
 			ns.gconfigchange = nil;
 			collectgarbage();

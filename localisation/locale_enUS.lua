@@ -42,6 +42,7 @@ ns.L = {
 	FT_MOVE = "Shift+Left click to move the window",
 	FT_MODUS = "Modus",
 	FT_TIME_LEFT = "Time left",
+	FT_RECORDING = "Recording",
 	FT_CALCULATED = "Calculated",
 	FT_ACCURATE = "Accurate",
 	FT_MISSING_HOPS = "Missing hops",

@@ -122,6 +122,9 @@ function ns:gconfigchange(newversion)
 			end
 			
 		end
+		if(ns.gconf.version<10) then
+			FlightMapEnhanced_FlightTimes = {};
+		end
 		
 		ns.gconf.version = newversion;
 end
