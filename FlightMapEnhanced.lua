@@ -770,10 +770,13 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 				ns:configchange(FlightMapEnhanced_Config.vconf.version,12);
 			end
 			ns.configchange = nil;
-			if(ns.gconf.version < 10) then
-				ns:gconfigchange(10);
+			if(ns.gconf.version < 11) then
+				ns:gconfigchange(11);
 			end
 			ns.gconfigchange = nil;
+			if not (ns.gconf.id) then
+				ns.gconf.id = UnitGUID("player");
+			end
 			collectgarbage();
 		end	
 	end
