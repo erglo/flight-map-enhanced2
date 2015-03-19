@@ -360,7 +360,7 @@ function FlightMapEnhanced_CreateFlyPathTable()
 		--temp always update this on flightmaster to iron out a bug which 6.1 brought showing all flight master as available in the list not discovered = distant
 		if(true or updatenames == true or updatediscovered== true) then
 			
-			if (TaxiNodeGetType(i)~='DISTANT') then
+			--if (TaxiNodeGetType(i)~='DISTANT') then
 				
 				local tx,ty = TaxiNodePosition(i);
 				local flid = CalcFlId(tx,ty,curcont);
@@ -373,11 +373,11 @@ function FlightMapEnhanced_CreateFlyPathTable()
 					end
 				end
 				if(updatediscovered==true or true) then
-				   if not(flocdis[flid]) then
+				   if (not flocdis[flid] and TaxiNodeGetType(i)~='DISTANT') then
 					flocdis[flid] = 1;
 				   end
 				end
-			end
+			--end
 		end
 		
 		if(TaxiNodeGetType(i)=="REACHABLE") then

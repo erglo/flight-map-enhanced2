@@ -65,6 +65,7 @@ function ns:initft()
 	
 			
 			local numroutes = GetNumRoutes(wn);
+			
 			local dX,dY,flid,sX,sY;
 			local aflidgen = true;
 			flight_route_accurate = '';
@@ -85,7 +86,7 @@ function ns:initft()
 					sY = TaxiGetSrcY(wn, i);
 					flid = CalcFlId(sX,sY,GetCurrentMapContinent())
 					if(ns.flocn[flid] ~= nil) then
-					
+						
 						local accuid = module:getid(flid);
 						if(accuid>-1) then
 							flight_route_accurate = GetCurrentMapContinent().."-"..accuid;
@@ -123,7 +124,9 @@ function ns:initft()
 					end
 					
 				else
+				
 					if(missingidshown==false) then
+					
 						missingidshown = true;
 						module:printchangeid(flid,TaxiNodeName(wn));
 					end
@@ -155,7 +158,7 @@ function ns:initft()
 		if(oldid>0) then
 			print("Flight Map Enhanced: "..string.format(L.FT_CANNOT_FIND_ID_NEW,nodename,oldid,newid))
 		end
-	
+		
 	end
 	
 	function module:taketaxinode(wn)
