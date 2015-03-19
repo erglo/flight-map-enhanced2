@@ -299,6 +299,7 @@ function ns:initft()
 		f:SetScript("OnLeave",function() GameTooltip:Hide(); end); 
 		f:Hide();
 		hooksecurefunc('TaxiNodeOnButtonEnter',module.buildflyroutes);
+		if not FlightMapEnhanced_Config.vconf.module.ft then FlightMapEnhanced_Config.vconf.module.ft = {}; end
 		options = FlightMapEnhanced_Config.vconf.module.ft;
 	end
 	
