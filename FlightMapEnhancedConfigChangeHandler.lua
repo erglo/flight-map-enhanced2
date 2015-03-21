@@ -16,12 +16,7 @@ function ns:configchange(version,newversion)
 				FlightMapEnhanced_Module_wmc_minimap:SetChecked(1);
 			end
 		end
-		if(version<5) then
-			FlightMapEnhanced_Config.vconf.modules["ft"] = 1;
-			if(ns.ft ~= nil) then
-				_G["FlightMapEnhanced_Module_ft"]:SetChecked(1);
-			end
-		end
+		
 		--if(version<6) then
 		--	FlightMapEnhanced_FlightTimes = {};
 		--end
@@ -36,14 +31,7 @@ function ns:configchange(version,newversion)
 				FlightMapEnhanced_Config.vconf.module.ft.points = nil;
 			end
 		end
-		if(version<9) then
-			
-			FlightMapEnhanced_Config.vconf.module.ft.showaccuratemap = 1;
-			if(ns.ft ~= nil) then
-				_G["FlightMapEnhanced_Module_ft_show_accurate_map"]:SetChecked(1);
-			end
-			
-		end
+		
 		if(version<10) then
 			FlightMapEnhanced_Config["discovery"]["count"][6] = 0;
 		end
