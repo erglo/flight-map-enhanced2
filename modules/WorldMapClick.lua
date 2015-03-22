@@ -18,6 +18,8 @@ function ns:initwmc()
 		minimappointer:SetFrameLevel(10000);
 	end
 
+
+	
 	function module:GetCursorPos()
 		local left, top = WorldMapDetailFrame:GetLeft(), WorldMapDetailFrame:GetTop()
 		local width, height = WorldMapDetailFrame:GetWidth(), WorldMapDetailFrame:GetHeight()
@@ -37,6 +39,61 @@ function ns:initwmc()
 	function module:FlightTaken()
 		minimappointer:Hide();
 	end
+	
+	function module:GetClosestForQuest(questLogIndex)
+		--local mapID, floorNumber = GetQuestWorldMapAreaID(questID);
+			
+		local parent = ObjectiveTrackerFrame.BlocksFrame;
+		local distSqr, onContinent = GetDistanceSqToQuest(questLogIndex);
+		if(onContinent == false) then return end
+		--local questID, title, _, numObjectives, requiredMoney, isComplete, startEvent, isAutoComplete, failureTime, timeElapsed, questType, isTask, isStory, isOnMap, hasLocalPOI = GetQuestWatchInfo(questLogIndex);
+		
+		local _, _, _, _, _, isComplete, _, questID = GetQuestLogTitle(questLogIndex);
+		local mapID, floorNumber = GetQuestWorldMapAreaID(questID);
+		
+		if ( mapID ~= 0 ) then
+			SetMapByID(mapID);
+			local curcont = GetCurrentMapContinent();
+			local curmapid=mapID;
+			--print (questID)
+			local _,togox,togoy = QuestPOIGetIconInfo(questID)
+			--print (togox.."---"..togoy);
+			local nextflight=FlightMapEnhanced_GetClosestFlightPath(curcont,curmapid,togox,togoy);		
+			
+			if(nextflight.name) then
+				FlightMapEnhanced_SetNextFly(nextflight.name);
+				if(FlightMapEnhanced_Config.vconf.module.wmc.minimap) then
+				
+					local curcont,curmapid,curmaplevel,posX,posY = ns:GetPlayerData();
+					local closestfp = FlightMapEnhanced_GetClosestFlightPath(curcont,curmapid,posX,posY);
+		
+				
+					if(closestfp.name) then
+						ns.Astrolabe:PlaceIconOnMinimap(minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y );
+						minimappointer:Show();
+					end
+				end
+			end		
+			
+		else
+			return;
+		end
+		
+		
+	end
+	
+	function module:QuestFrameAdd()
+		local block = self.activeFrame;
+		local questLogIndex = block.questLogIndex;
+		local info = UIDropDownMenu_CreateInfo();
+		info.notCheckable = 1;
+		info.text = L.WMC_SET_QUEST_FLY;
+		info.func = module.GetClosestForQuest;
+		info.arg1 = questLogIndex;
+		info.noClickSound = 1;
+		info.checked = false;
+		UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+	end
 
 	function module:WorldMapClickHandler(mouseButton)
 		--need check if continent is same
@@ -49,7 +106,7 @@ function ns:initwmc()
 			local curmapid=GetCurrentMapAreaID();
 			local togox,togoy = module:GetCursorPos();
 			local nextflight=FlightMapEnhanced_GetClosestFlightPath(curcont,curmapid,togox,togoy);		
-	
+			
 			if(nextflight.name) then
 				FlightMapEnhanced_SetNextFly(nextflight.name);
 				if(FlightMapEnhanced_Config.vconf.module.wmc.minimap) then
@@ -161,17 +218,37 @@ function ns:initwmc()
 		_G[ showminimap:GetName().."Text" ]:SetWidth(InterfaceOptionsFramePanelContainer:GetRight() - InterfaceOptionsFramePanelContainer:GetLeft() - 30);
 		_G[ showminimap:GetName().."Text" ]:SetJustifyH("LEFT");
 		
+		local questfly = CreateFrame( "CheckButton", "FlightMapEnhanced_Module_wmc_questfly", config, "InterfaceOptionsCheckButtonTemplate" );
+		config.questfly = questfly;
+		questfly.id = "questfly";
+		questfly:SetPoint( "TOPLEFT", showminimap, "BOTTOMLEFT", 0, -16);
+		questfly:SetScript("onClick",config.ChangeState);
+		_G[ questfly:GetName().."Text" ]:SetText( L.WMC_QUEST_FLY );
+		_G[ questfly:GetName().."Text" ]:SetWidth(InterfaceOptionsFramePanelContainer:GetRight() - InterfaceOptionsFramePanelContainer:GetLeft() - 30);
+		_G[ questfly:GetName().."Text" ]:SetJustifyH("LEFT");
 		
+		--local questflyexplain = config:CreateFontString( nil, "OVERLAY", "GameFontHighlight" );
+		--moduleconfig.Modulewmcexplain = Modulewmcexplain;
+		--questflyexplain:SetPoint("TOPLEFT", questfly,"TOPLEFT", 0, -16)
+		--questflyexplain:SetWidth(InterfaceOptionsFramePanelContainer:GetRight() - InterfaceOptionsFramePanelContainer:GetLeft() - 30);
+		--questfly:SetHeight(questflyexplain:GetHeight() + 15);
+		--questflyexplain:SetJustifyH("LEFT");
+		--questflyexplain:SetText( L.WMC_QUEST_FLY_EXPLAIN);
 		
 		InterfaceOptions_AddCategory(config);
-	 
+		if(FlightMapEnhanced_Config.vconf.module.wmc.questfly == nil) then
+			FlightMapEnhanced_Config.vconf.module.wmc.questfly = true;
+		end
 		if not (FlightMapEnhanced_Config.vconf.module.wmc) then
 			FlightMapEnhanced_Config.vconf.module.wmc = {};
 			config:SetDefaultConfig();
 		end
 		config:InitDropDowns();
 		showminimap:SetChecked(FlightMapEnhanced_Config.vconf.module.wmc.minimap);
-	 
+		questfly:SetChecked(FlightMapEnhanced_Config.vconf.module.wmc.questfly);
+		--QuestObjectiveTracker_OnOpenDropDown
+		hooksecurefunc("QuestObjectiveTracker_OnOpenDropDown",module.QuestFrameAdd);
+		
 	end
 	
 	function config:ChangeState()
