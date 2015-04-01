@@ -236,12 +236,13 @@ function ns:initwmc()
 		--questflyexplain:SetText( L.WMC_QUEST_FLY_EXPLAIN);
 		
 		InterfaceOptions_AddCategory(config);
-		if(FlightMapEnhanced_Config.vconf.module.wmc.questfly == nil) then
-			FlightMapEnhanced_Config.vconf.module.wmc.questfly = true;
-		end
+		
 		if not (FlightMapEnhanced_Config.vconf.module.wmc) then
 			FlightMapEnhanced_Config.vconf.module.wmc = {};
 			config:SetDefaultConfig();
+		end
+		if(FlightMapEnhanced_Config.vconf.module.wmc.questfly == nil) then
+			FlightMapEnhanced_Config.vconf.module.wmc.questfly = true;
 		end
 		config:InitDropDowns();
 		showminimap:SetChecked(FlightMapEnhanced_Config.vconf.module.wmc.minimap);
