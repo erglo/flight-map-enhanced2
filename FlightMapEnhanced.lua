@@ -15,7 +15,7 @@ FlightMapEnhanced_FlightLocations = {};
 FlightMapEnhanced_FlightNames = {};
 FlightMapEnhanced_Config = {};
 FlightMapEnhancedCFrame = {};
-
+local ldb =  LibStub:GetLibrary("LibDataBroker-1.1");
 function FlightMapEnhanced_OnLoad(self)
 	self:RegisterEvent("TAXIMAP_OPENED");
 	self:RegisterEvent("TAXIMAP_CLOSED");
@@ -510,6 +510,7 @@ end
 --this could be used by other addon if wanted
 function FlightMapEnhanced_SetNextFly(flyto)
 	nextflight = flyto;
+	ns.databroker.text = "|c0000FF00"..flyto
 	print("|c0000FF00Flight Map Enhanced|r: "..L.NEXT_FLIGHT_GOTO.." "..flyto);
 end
 
@@ -777,9 +778,16 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 			if not (ns.gconf.id) then
 				ns.gconf.id = UnitGUID("player");
 			end
+			ns.databroker = ldb:NewDataObject("Flight Map Enhanced", { type = "data source", label ="", text = "", icon = "Interface\\MINIMAP\\TRACKING\\FlightMaster", OnTooltipShow = function (self) self:AddLine(L.TOOLTIP_LINE2_MINIMAP) end, OnClick = ns.DataBrokerClick });
+		
 			collectgarbage();
 		end	
 	end
+end
+
+function ns:DataBrokerClick()
+	FlightMapEnhancedMinimapButton_OnClick()
+	
 end
 
 function FlightMapEnhanced_SavePosSize(frame)
@@ -816,7 +824,7 @@ function FlightMapEnhancedMinimapButton_OnClick()
 	end
 	local menu = {};
 
-	menu[1] = { text = "none", func = function() nextflight=nil;if(ns.wmc) then	ns.wmc:FlightTaken(); end end,checked=true }
+	menu[1] = { text = "none", func = function() ns.databroker.text = "";  nextflight=nil;if(ns.wmc) then	ns.wmc:FlightTaken(); end end,checked=true }
 	local round = 2;
 	for key, val in pairsByKeys(FlightMapEnhanced_Config.fps[a]) do
 		if(key~="total") then
@@ -836,7 +844,7 @@ function FlightMapEnhancedMinimapButton_OnClick()
 					tmpmenu.checked = true;
 					menu[1].checked = false;
 				else
-					tinsert(tmpmenu.menuList, { text = key2, func = function() nextflight=key2;DropDownList1:Hide(); end});
+					tinsert(tmpmenu.menuList, { text = key2, func = function() ns.databroker.text = key2; nextflight=key2;DropDownList1:Hide(); end});
 				end
 			end
 			menu[round]=tmpmenu;

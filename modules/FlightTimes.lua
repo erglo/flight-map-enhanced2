@@ -412,16 +412,19 @@ function ns:initft()
 		lasttimer = lasttimer + elapsed;
 		if(lasttimer>=0.5) then
 			local displaytext = '';
+			local datacolor;
 			if (recordingmode==false) then
 				timeleft=timeleft-lasttimer;
-				
+			    datacolor = "|cFF00FF00";
 				displaytext = L.FT_TIME_LEFT;
 			else
 				timeleft=time()-flystart;
 				displaytext = L.FT_RECORDING;
+				datacolor = "|cFFFF0000";
 			end
 			local minutes,seconds = module:CalcTime(floor(timeleft));
 			module.tframe.timeleft:SetText("|cFFFFFFFF"..displaytext..": |r"..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT);
+			ns.databroker.text = datacolor..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT;
 			lasttimer = 0;
 		end
 	end
@@ -429,6 +432,8 @@ function ns:initft()
 	function module:FlightTimerOff()
 		module.tframe:SetScript("OnUpdate",nil);
 		module.tframe:Hide();	
+		ns.databroker.label = "";
+		ns.databroker.text = "";
 	end
 	
 	function module:SetTimerWidth()
@@ -455,6 +460,7 @@ function ns:initft()
 		end
 		timeleft = ttime;
 		module.tframe.flightpath:SetText("|cFFFFFFFF"..startname.."->"..endname);
+		ns.databroker.label = endname;
 		local minutes,seconds=module:CalcTime(ttime);
 		module.tframe.timeleft:SetText("|cFFFFFFFF"..displaytext..": |r"..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT);
 		lasttimer = 0;
