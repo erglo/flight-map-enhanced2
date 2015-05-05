@@ -788,6 +788,7 @@ end
 function ns:DataBrokerClick()
 	FlightMapEnhancedMinimapButton_OnClick()
 	
+	
 end
 
 function FlightMapEnhanced_SavePosSize(frame)
