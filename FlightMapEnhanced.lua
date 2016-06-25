@@ -329,7 +329,7 @@ function FlightMapEnhanced_CreateFlyPathTable()
 	
 	if(doreminder) then
 		if(tcount(FlightMapEnhanced_FlightTimes)>0 or tcount(FlightMapEnhanced_FlightLocations)>0) then
-			print("|c0000FF00Flight Map Enhanced|r:"..L.NEW_FLIGHT_PATH_DISCOVERED_HELP);
+			print("|c0000FF00Flight Map Enhanced|r:"..L.NEW_FLIGHT_PATH_DISCOVERED_HELP.."http://wido.io/wow/addons/flight-map-enhanced-times/upload/");
 			doreminder = false;
 			ns.gconf.lastcheck = time();
 		end	
