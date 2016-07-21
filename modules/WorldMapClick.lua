@@ -69,7 +69,7 @@ function ns:initwmc()
 		
 				
 					if(closestfp.name) then
-						ns.Astrolabe:PlaceIconOnMinimap(minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y );
+						ns.DragonPins:AddMinimapIconMF(ns,minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y );
 						minimappointer:Show();
 					end
 				end
@@ -116,7 +116,7 @@ function ns:initwmc()
 		
 				
 					if(closestfp.name) then
-						ns.Astrolabe:PlaceIconOnMinimap(minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y );
+						ns.DragonPins:AddMinimapIconMF(ns, minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y );
 						minimappointer:Show();
 					end
 				end

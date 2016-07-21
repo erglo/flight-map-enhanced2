@@ -56,6 +56,10 @@ function ns:configchange(version,newversion)
 			
 		
 		end
+		
+		if(version<13) then
+			FlightMapEnhanced_Config["discovery"]["count"][8] = 0;
+		end
 			
 		
 		FlightMapEnhanced_Config.vconf.version = newversion;
@@ -115,6 +119,9 @@ function ns:gconfigchange(newversion)
 		end
 		if(ns.gconf.version<11) then
 			ns.gconf.id = nil;
+		end
+		if(ns.gconf.version<13) then
+			FlightMapEnhanced_FlightNames["count"][8] = 0;
 		end
 		
 		ns.gconf.version = newversion;

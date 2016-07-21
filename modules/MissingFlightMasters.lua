@@ -87,7 +87,7 @@ function ns:initmfm()
 				missing_pointers[current]:SetHeight(s);
 				missing_pointers[current]:SetWidth(s);
 				missing_pointers[current]:Show();
-				ns.Astrolabe:PlaceIconOnWorldMap( WorldMapDetailFrame, missing_pointers[current], i, GetCurrentMapDungeonLevel(), v2.x, v2.y );
+				ns.DragonPins:AddWorldMapIconMF( WorldMapDetailFrame, missing_pointers[current], i, GetCurrentMapDungeonLevel(), v2.x, v2.y );
 				current=current+1;
 			end
 		end
@@ -102,7 +102,7 @@ function ns:initmfm()
 			missing_pointers[current]:SetHeight(30);
 			missing_pointers[current]:SetWidth(30);
 			missing_pointers[current]:Show();
-			ns.Astrolabe:PlaceIconOnWorldMap( WorldMapDetailFrame, missing_pointers[current], m, GetCurrentMapDungeonLevel(), v.x, v.y );
+			ns.DragonPins:AddWorldMapIconMF( WorldMapDetailFrame, missing_pointers[current], m, GetCurrentMapDungeonLevel(), v.x, v.y );
 			current=current+1;
 		end
 	end

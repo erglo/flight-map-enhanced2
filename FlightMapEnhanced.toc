@@ -1,13 +1,14 @@
-## Interface: 60200
+## Interface: 70000
 ## Title: Flight Map Enhanced
 ## Author: Dorwido
-## Version: 1.7.8
+## Version: 1.8.0
 ## Notes: Enhances the normal Flight Map with adding a list to choose where you want to fly.
 ## SavedVariables: FlightMapEnhanced_FlightLocations, FlightMapEnhanced_FlightNames, FlightMapEnhanced_FlightTimes, FlightMapEnhanced_GlobalConf
 ## SavedVariablesPerCharacter: FlightMapEnhanced_Config
-libs\Astrolabe\Load.xml
 libs\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
+libs\HereBeDragons-1.0\HereBeDragons-1.0.lua
+libs\HereBeDragons-1.0\HereBeDragons-Pins-1.0.lua
 libs\libdatabroker-1-1\LibDataBroker-1.1.lua
 localisation\locale_enUS.lua
 localisation\locale_deDE.lua

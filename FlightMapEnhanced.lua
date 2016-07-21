@@ -108,6 +108,13 @@ function ns:timer(seconds,command)
 end
 
 local function CalcFlId(x,y,z)
+	if(x<0) then
+		x=x*-1;
+	end
+	if(y<0) then
+		y=y*-1;
+	end
+	print (tonumber(z..ceil(x*100)..ceil(y*100)));
 	return tonumber(z..ceil(x*100)..ceil(y*100));
 
 end
@@ -363,6 +370,7 @@ function FlightMapEnhanced_CreateFlyPathTable()
 			--if (TaxiNodeGetType(i)~='DISTANT') then
 				
 				local tx,ty = TaxiNodePosition(i);
+				
 				local flid = CalcFlId(tx,ty,curcont);
 				--print (flid)
 				--print (match1)
@@ -532,7 +540,7 @@ function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
 					--print(ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y));
 					--old local dist = CalcDist(coordx,value.x,coordy,value.y);
 					--print (mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
-					local dist = ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
+					local dist = ns.Dragon:GetZoneDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
 					--print ("c:"..closest);
 					--print ("-");
 					--print(dist);
@@ -574,7 +582,7 @@ function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
 					--print(ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y));
 					--old local dist = CalcDist(coordx,value.x,coordy,value.y);
 					--print (mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
-					local dist = ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
+					local dist = ns.Dragon:GetZoneDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
 					--print ("c:"..closest);
 					--print ("-");
 					--print(dist);
@@ -619,7 +627,7 @@ function FlightMapEnhanced_GetDistanceOfTwoFlightPoints(sourceid,destid)
 		end
 	end
 	--print(source["map"]);
-	local dist=ns.Astrolabe:ComputeDistance(source.map,0,source.x,source.y,target.map,0,target.x,target.y);
+	local dist=ns.Dragon:GetZoneDistance(source.map,0,source.x,source.y,target.map,0,target.x,target.y);
 	return dist;
 end
 
@@ -661,7 +669,8 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 		FlightMapEnhancedTaxiChoice:Hide();
 		taxinodeinfos = {};
 	elseif(event=="ADDON_LOADED") then
-		ns.Astrolabe = DongleStub("Astrolabe-1.0");
+		ns.Dragon = LibStub:GetLibrary("HereBeDragons-1.0");
+		ns.DragonPins = LibStub:GetLibrary("HereBeDragons-Pins-1.0");
 		local arg1 = ...;
 		
 		if(arg1 == "FlightMapEnhanced") then
@@ -766,13 +775,13 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 			ns:LoadModules();
 			
 			if not(FlightMapEnhanced_Config.vconf.version) then
-				ns:configchange(0,12);
-			elseif(FlightMapEnhanced_Config.vconf.version<12) then
-				ns:configchange(FlightMapEnhanced_Config.vconf.version,12);
+				ns:configchange(0,13);
+			elseif(FlightMapEnhanced_Config.vconf.version<13) then
+				ns:configchange(FlightMapEnhanced_Config.vconf.version,13);
 			end
 			ns.configchange = nil;
-			if(ns.gconf.version < 11) then
-				ns:gconfigchange(11);
+			if(ns.gconf.version < 13) then
+				ns:gconfigchange(13);
 			end
 			ns.gconfigchange = nil;
 			if not (ns.gconf.id) then
