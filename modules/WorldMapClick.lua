@@ -69,7 +69,7 @@ function ns:initwmc()
 		
 				
 					if(closestfp.name) then
-						ns.DragonPins:AddMinimapIconMF(ns,minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y );
+						ns.DragonPins:AddMinimapIconMF(Minimap,minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
 						minimappointer:Show();
 					end
 				end
@@ -116,7 +116,7 @@ function ns:initwmc()
 		
 				
 					if(closestfp.name) then
-						ns.DragonPins:AddMinimapIconMF(ns, minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y );
+						ns.DragonPins:AddMinimapIconMF(Minimap, minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
 						minimappointer:Show();
 					end
 				end
