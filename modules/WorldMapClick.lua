@@ -40,11 +40,13 @@ function ns:initwmc()
 		minimappointer:Hide();
 	end
 	
-	function module:GetClosestForQuest(questLogIndex)
+	function module:GetClosestForQuest(questID)
 		--local mapID, floorNumber = GetQuestWorldMapAreaID(questID);
-			
+		local questLogIndex = GetQuestLogIndexByID(questID);
 		local parent = ObjectiveTrackerFrame.BlocksFrame;
+		--print (questLogIndex);
 		local distSqr, onContinent = GetDistanceSqToQuest(questLogIndex);
+		--print(distSqr);
 		if(onContinent == false) then return end
 		--local questID, title, _, numObjectives, requiredMoney, isComplete, startEvent, isAutoComplete, failureTime, timeElapsed, questType, isTask, isStory, isOnMap, hasLocalPOI = GetQuestWatchInfo(questLogIndex);
 		
@@ -84,7 +86,7 @@ function ns:initwmc()
 	
 	function module:QuestFrameAdd()
 		local block = self.activeFrame;
-		local questLogIndex = block.questLogIndex;
+		local questLogIndex = block.id --questLogIndex;
 		local info = UIDropDownMenu_CreateInfo();
 		info.notCheckable = 1;
 		info.text = L.WMC_SET_QUEST_FLY;
@@ -93,6 +95,17 @@ function ns:initwmc()
 		info.noClickSound = 1;
 		info.checked = false;
 		UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
+	end
+	
+	function module:SetClosestFlightMaster()
+		local curcont,curmapid,curmaplevel,posX,posY = ns:GetPlayerData();
+		local closestfp = FlightMapEnhanced_GetClosestFlightPath(curcont,curmapid,posX,posY);
+		
+				
+		if(closestfp.name) then
+			ns.DragonPins:AddMinimapIconMF(Minimap,minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
+			minimappointer:Show();
+		end
 	end
 
 	function module:WorldMapClickHandler(mouseButton)

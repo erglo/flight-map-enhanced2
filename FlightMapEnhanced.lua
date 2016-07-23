@@ -1,3 +1,4 @@
+BINDING_HEADER_FLIGHTMAPENHANCED = "Flight Map Enhanced";
 local _,ns = ...;
 local taxinodeinfos = {};
 local firstshow = false;
@@ -114,7 +115,7 @@ local function CalcFlId(x,y,z)
 	if(y<0) then
 		y=y*-1;
 	end
-	print (tonumber(z..ceil(x*100)..ceil(y*100)));
+	--print (tonumber(z..ceil(x*100)..ceil(y*100)));
 	return tonumber(z..ceil(x*100)..ceil(y*100));
 
 end
@@ -524,8 +525,8 @@ end
 
 --this could be used by other addon if wanted
 --todo with calculation now over all zones per continent may should changed the format of FlightMapEnhancedLocations.lua
-function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
-
+function FlightMapEnhanced_GetClosestFlightPath_old(mapcont,mapareaid,coordx,coordy)
+	print("1");
 	--if not (floc[mapareaid]) then
 	--	print(L.NO_FLIGHT_LOCATIONS_KNOWN);
 	if(flocdis["count"][mapcont] == 0) then
@@ -566,8 +567,12 @@ function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
 	end
 end
 
-function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
+function FlightMapEnhanced_SetClosestFlightMaster()
+	ns.wmc.SetClosestFlightMaster();
+end
 
+function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
+	
 	--if not (floc[mapareaid]) then
 	--	print(L.NO_FLIGHT_LOCATIONS_KNOWN);
 	if(flocdis["count"][mapcont] == 0) then

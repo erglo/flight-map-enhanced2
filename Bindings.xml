@@ -1,0 +1,7 @@
+<Bindings>
+	<Binding name="Show closest Flight Master" header="FLIGHTMAPENHANCED">
+		FlightMapEnhanced_SetClosestFlightMaster();
+	</Binding>
+</Bindings>
+
+

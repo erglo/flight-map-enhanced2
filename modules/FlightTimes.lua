@@ -18,8 +18,18 @@ function ns:initft()
 	local missingidshown = false;
 
 	local function CalcFlId(x,y,z)
-		local flid=tonumber(z..ceil(x*100)..ceil(y*100));
-		--print(flid);
+		--local flid=tonumber(z..ceil(x*100)..ceil(y*100));
+		
+		if(x<0) then
+			x=x*-1;
+		end
+		if(y<0) then
+			y=y*-1;
+		end
+	
+		local flid = tonumber(z..ceil(x*100)..ceil(y*100));
+		
+		
 		if(remapid[flid]) then
 			return remapid[flid];
 		else
@@ -58,6 +68,17 @@ function ns:initft()
 		end
 	end
 	
+	function module:getCurrentContinent()
+		local oldmapid = GetCurrentMapAreaID();
+		local oldlevel = GetCurrentMapDungeonLevel();
+		SetMapToCurrentZone();
+		local cont = GetCurrentMapContinent();
+		SetMapByID(oldmapid);
+		SetDungeonMapLevel(oldlevel);
+		return cont;
+	end
+	
+	
 	--gonna need overwork for now just ripped of the taketaxinode hook
 	function module:buildflyroutes(button)
 			
@@ -77,19 +98,19 @@ function ns:initft()
 				--	
 				--	sX = TaxiGetSrcX(wn, i);
 			--		sY = TaxiGetSrcY(wn, i);
-			--		flid = CalcFlId(sX,sY,GetCurrentMapContinent())
+			--		flid = CalcFlId(sX,sY,getCurrentContinent())
 			--		print(flid);
 				
 			--	end
 					
 					sX = TaxiGetSrcX(wn, i);
 					sY = TaxiGetSrcY(wn, i);
-					flid = CalcFlId(sX,sY,GetCurrentMapContinent())
+					flid = CalcFlId(sX,sY,module:getCurrentContinent())
 					if(ns.flocn[flid] ~= nil) then
 						
 						local accuid = module:getid(flid);
 						if(accuid>-1) then
-							flight_route_accurate = GetCurrentMapContinent().."-"..accuid;
+							flight_route_accurate = module:getCurrentContinent().."-"..accuid;
 						else
 							
 							aflidgen = false;
@@ -109,7 +130,7 @@ function ns:initft()
 				
 				dX = TaxiGetDestX(wn, i);
 				dY = TaxiGetDestY(wn, i);
-				flid = CalcFlId(dX,dY,GetCurrentMapContinent());
+				flid = CalcFlId(dX,dY,module:getCurrentContinent());
 				
 				--currently The Argent Vanguard flight path fucks, maybe more
 				if ns.flocn[flid] ~= nil then
@@ -176,13 +197,13 @@ function ns:initft()
 				if(i==1) then
 					sX = TaxiGetSrcX(wn, i);
 					sY = TaxiGetSrcY(wn, i);
-					flid = CalcFlId(sX,sY,GetCurrentMapContinent())
+					flid = CalcFlId(sX,sY,module:getCurrentContinent())
 					startname = FlightMapEnhanced_FlightNames[flid];
 					if(ns.flocn[flid] ~= nil) then
 						
 						local accuid = module:getid(flid);
 						if(accuid>-1) then
-							flight_route_accurate = GetCurrentMapContinent().."-"..accuid;
+							flight_route_accurate = module:getCurrentContinent().."-"..accuid;
 						else
 							
 							aflidgen = false;
@@ -201,7 +222,7 @@ function ns:initft()
 				
 				dX = TaxiGetDestX(wn, i);
 				dY = TaxiGetDestY(wn, i);
-				flid = CalcFlId(dX,dY,GetCurrentMapContinent());
+				flid = CalcFlId(dX,dY,module:getCurrentContinent());
 				
 				--currently The Argent Vanguard flight path fucks, maybe more
 				if ns.flocn[flid] ~= nil then
@@ -296,6 +317,7 @@ function ns:initft()
 	
 		f:RegisterForDrag("LeftButton");
 		f:SetMovable(true);
+		f:EnableMouse(true)
 		f:SetScript("OnDragStart", function(self) if IsShiftKeyDown() then self:StartMoving() end end)
 		f:SetScript("OnDragStop", function(self) self:StopMovingOrSizing(); local a,b,c,d,e = self:GetPoint(); if(b~=nil) then b=b:GetName(); end; options.points = {a,b,c,d,e} end);
 		f:SetScript("OnEnter", function (self) GameTooltip:SetOwner(self, "ANCHOR_TOP");GameTooltip:SetText(L.FT_MOVE, nil, nil, nil, nil, 1); end);
