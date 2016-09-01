@@ -683,6 +683,24 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 		end
 		FlightMapEnhancedTaxiChoice:Show();
 		FlightMapEnhanced_AlterFlightPaths();
+		--temporary to see if nodeids are unique
+		--GetAllTaxiNodes
+		if not FlightMapEnhanced_Uniquetest then
+			FlightMapEnhanced_Uniquetest = {};
+		end
+		if not FlightMapEnhanced_Uniquetest[currentCont] then
+			FlightMapEnhanced_Uniquetest[currentCont] = {};
+			local taxiNodes = GetAllTaxiNodes();
+			for i, taxiNodeData in ipairs(taxiNodes) do
+				FlightMapEnhanced_Uniquetest[currentCont][taxiNodeData.name] =  {};
+				FlightMapEnhanced_Uniquetest[currentCont][taxiNodeData.name].x = taxiNodeData.x;
+				FlightMapEnhanced_Uniquetest[currentCont][taxiNodeData.name].y = taxiNodeData.y;
+				FlightMapEnhanced_Uniquetest[currentCont][taxiNodeData.name].id = taxiNodeData.nodeID;
+				
+			end
+		end
+		
+		
 	elseif(event=="TAXIMAP_CLOSED") then
 		FlightMapEnhancedTaxiChoice:Hide();
 		taxinodeinfos = {};

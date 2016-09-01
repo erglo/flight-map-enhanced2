@@ -1,9 +1,9 @@
 ## Interface: 70000
 ## Title: Flight Map Enhanced
 ## Author: Dorwido
-## Version: 1.9.1
+## Version: 1.9.2
 ## Notes: Enhances the normal Flight Map with adding a list to choose where you want to fly.
-## SavedVariables: FlightMapEnhanced_FlightLocations, FlightMapEnhanced_FlightNames, FlightMapEnhanced_FlightTimes, FlightMapEnhanced_GlobalConf
+## SavedVariables: FlightMapEnhanced_FlightLocations, FlightMapEnhanced_FlightNames, FlightMapEnhanced_FlightTimes, FlightMapEnhanced_GlobalConf, FlightMapEnhanced_Uniquetest
 ## SavedVariablesPerCharacter: FlightMapEnhanced_Config
 libs\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
