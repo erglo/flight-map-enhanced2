@@ -7,6 +7,7 @@ function ns:initwmc()
 	local L = ns.L;
 	local minimappointer;
 	function module:init()
+	
 		WorldMapButton:HookScript("OnMouseDown",module.WorldMapClickHandler);
 		config:init();
 		minimappointer=CreateFrame("Button", nil,UIParent );

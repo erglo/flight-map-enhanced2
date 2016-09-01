@@ -10,6 +10,7 @@ local nexttimercheck = 0.5;
 local lasttaxicount = {0,0,0,0};
 local doreminder = false;
 local autotake = false;
+local currentCont;
 ns.modules = {"wmc","mfm","ft"};
 local L = ns.L;
 FlightMapEnhanced_FlightLocations = {};
@@ -225,7 +226,8 @@ function FlightMapEnhancedTaxiChoiceContainer_Update()
 end
 
 function FlightMapEnhancedTaxiChoiceButton_OnEnter(self)
-	if not(self.isHeader) then
+	if not(self.isHeader) and currentCont ~= 8 then
+		
 		TaxiNodeOnButtonEnter(_G["TaxiButton"..self.flightpath]);
 	end
 end
@@ -641,14 +643,23 @@ end
 function FlightMapEnhanced_OnEvent(self,event,...)
 	
 	if(event=="TAXIMAP_OPENED") then
+		--old world and new world got different frames
+		local frameToUse;
+		currentCont = ns:GetPlayerData();
+		if(currentCont == 8) then
+			frameToUse = _G["FlightMapFrame"];
+		else
+			frameToUse = _G["TaxiFrame"];
+		end
 		if(NumTaxiNodes()==0) then return; end
 		firstshow = true;
 		FlightMapEnhanced_CreateFlyPathTable();
-		if(FlightMapEnhanced_Config.TaxiFramePoints) then
+		--temporary disable moving of flightframe in broken isles
+		if(FlightMapEnhanced_Config.TaxiFramePoints and currentCont ~= 8) then
 			TaxiFrame:ClearAllPoints();
 			TaxiFrame:SetPoint(unpack(FlightMapEnhanced_Config.TaxiFramePoints));
 		end
-		if(FlightMapEnhanced_Config.TaxiFrameSize) then
+		if(FlightMapEnhanced_Config.TaxiFrameSize and currentCont ~= 8) then
 			TaxiFrame:SetHeight(FlightMapEnhanced_Config.TaxiFrameSize[1]);
 			TaxiFrame:SetWidth(FlightMapEnhanced_Config.TaxiFrameSize[2]);
 			TAXI_MAP_WIDTH = TaxiFrame:GetWidth()-10;
@@ -657,10 +668,12 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 			DrawOneHopLines();
 		end
 		if( not FlightMapEnhanced_Config.vconf.DetachAddon or not FlightMapEnhanced_Config.FlightMapEnhancedTaxiChoicePoints or not FlightMapEnhanced_Config.FlightMapEnhancedTaxiChoiceSize) then
-			FlightMapEnhancedTaxiChoice:SetHeight(TaxiFrame:GetHeight());
+			 
+			
+			FlightMapEnhancedTaxiChoice:SetHeight(frameToUse:GetHeight());
 			FlightMapEnhancedTaxiChoice:SetWidth(250);
 			FlightMapEnhancedTaxiChoice:ClearAllPoints();
-			FlightMapEnhancedTaxiChoice:SetPoint("TOPLEFT",TaxiFrame,"BOTTOMRIGHT",0,TaxiFrame:GetHeight());
+			FlightMapEnhancedTaxiChoice:SetPoint("TOPLEFT",frameToUse,"BOTTOMRIGHT",0,frameToUse:GetHeight());
 		else
 			FlightMapEnhancedTaxiChoice:SetHeight( FlightMapEnhanced_Config.FlightMapEnhancedTaxiChoiceSize[1]);
 			FlightMapEnhancedTaxiChoice:SetWidth(FlightMapEnhanced_Config.FlightMapEnhancedTaxiChoiceSize[2]);

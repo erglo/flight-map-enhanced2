@@ -81,7 +81,7 @@ function ns:initft()
 	
 	--gonna need overwork for now just ripped of the taketaxinode hook
 	function module:buildflyroutes(button)
-			
+			print("building");
 			local wn = self:GetID();
 	
 			
@@ -362,7 +362,8 @@ function ns:initft()
 	end
 
 	function module:saveaccurate()
-
+			print('pup');
+			print (flight_route_accurate);
 		
 			if(flight_route_accurate=='') then return; end
 				local curcont,curmapid,curmaplevel,posX,posY = ns:GetPlayerData();
