@@ -696,6 +696,7 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 				FlightMapEnhanced_Uniquetest[currentCont][taxiNodeData.name].x = taxiNodeData.x;
 				FlightMapEnhanced_Uniquetest[currentCont][taxiNodeData.name].y = taxiNodeData.y;
 				FlightMapEnhanced_Uniquetest[currentCont][taxiNodeData.name].id = taxiNodeData.nodeID;
+				FlightMapEnhanced_Uniquetest[currentCont][taxiNodeData.name].continent = currentCont;
 				
 			end
 		end
