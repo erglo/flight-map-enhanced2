@@ -528,7 +528,7 @@ end
 --this could be used by other addon if wanted
 --todo with calculation now over all zones per continent may should changed the format of FlightMapEnhancedLocations.lua
 function FlightMapEnhanced_GetClosestFlightPath_old(mapcont,mapareaid,coordx,coordy)
-	print("1");
+	--print("1");
 	--if not (floc[mapareaid]) then
 	--	print(L.NO_FLIGHT_LOCATIONS_KNOWN);
 	if(flocdis["count"][mapcont] == 0) then
