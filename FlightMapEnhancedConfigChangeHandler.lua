@@ -63,6 +63,7 @@ function ns:configchange(version,newversion)
 			
 		if(version<14) then
 			FlightMapEnhanced_Config["discovery"] = nil;
+			FlightMapEnhanced_Config["discovery"] = {};
 		end
 		
 		FlightMapEnhanced_Config.vconf.version = newversion;
