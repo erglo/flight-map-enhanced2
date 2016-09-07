@@ -62,7 +62,7 @@ function ns:configchange(version,newversion)
 		end
 			
 		if(version<14) then
-			FlightMapEnhanced_Config["discovery"] = nil;
+			--FlightMapEnhanced_Config["discovery"] = nil;
 			FlightMapEnhanced_Config["discovery"] = {};
 		end
 		
@@ -129,9 +129,12 @@ function ns:gconfigchange(newversion)
 		end
 		
 		if(ns.gconf.version<14) then
-			FlightMapEnhanced_FlightLocations = nil;
-			FlightMapEnhanced_FlightNames = nil;
-			FlightMapEnhanced_FlightTimes = nil;
+			FlightMapEnhanced_FlightLocations = {};
+			FlightMapEnhanced_FlightNames = {};
+			FlightMapEnhanced_FlightTimes = {};
+			--FlightMapEnhanced_FlightLocations = {};
+			--FlightMapEnhanced_FlightNames = {};
+			--FlightMapEnhanced_FlightTimes = {};
 		end
 		
 		ns.gconf.version = newversion;

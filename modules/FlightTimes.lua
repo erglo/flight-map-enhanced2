@@ -195,13 +195,13 @@ end
 			flight_route_accurate = '';
 			
 					flid = CalcFlIdCurrent();
-					startname = FlightMapEnhanced_FlightNames[flid];
+					startname = ns.flocn[flid];
 					flight_route_accurate = flid..'-';
 					
 			
 				
 					flid = CalcFlId(wn);
-					endname = FlightMapEnhanced_FlightNames[flid]
+					endname = ns.flocn[flid]
 					flight_route_accurate = flight_route_accurate..flid;
 			
 				
