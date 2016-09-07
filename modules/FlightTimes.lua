@@ -17,25 +17,25 @@ function ns:initft()
 	local flyend = 0;
 	local missingidshown = false;
 
-	local function CalcFlId(x,y,z)
-		--local flid=tonumber(z..ceil(x*100)..ceil(y*100));
+	local function CalcFlId(slotIndex)
+		local taxiNodes = GetAllTaxiNodes();
+			for i, taxiNodeData in ipairs(taxiNodes) do
+				if(slotIndex == taxiNodeData.slotIndex) then
+					return taxiNodeData.nodeID;
+				end				
+			end	
 		
-		if(x<0) then
-			x=x*-1;
-		end
-		if(y<0) then
-			y=y*-1;
-		end
-	
-		local flid = tonumber(z..ceil(x*100)..ceil(y*100));
-		
-		
-		if(remapid[flid]) then
-			return remapid[flid];
-		else
-			return flid;
-		end
 	end
+	
+	local function CalcFlIdCurrent()
+	local taxiNodes = GetAllTaxiNodes();
+			for i, taxiNodeData in ipairs(taxiNodes) do
+				if(1 == taxiNodeData.type) then
+					return taxiNodeData.nodeID;
+				end				
+			end	
+
+end
 	
 	local function round(num, idp)
 		local mult = 10^(idp or 0)
@@ -79,7 +79,7 @@ function ns:initft()
 	end
 	
 	
-	--gonna need overwork for now just ripped of the taketaxinode hook
+	--gonna need overwork for now just ripped of the taketaxinode hook | not used for now, not needed anymore???
 	function module:buildflyroutes(button)
 			--print("building");
 			local wn = self:GetID();
@@ -176,15 +176,15 @@ function ns:initft()
 			end
 		end
 		
-		if(oldid>0) then
-			print("Flight Map Enhanced: "..string.format(L.FT_CANNOT_FIND_ID_NEW,nodename,oldid,newid))
-		end
+		--if(oldid>0) then
+		--	print("Flight Map Enhanced: "..string.format(L.FT_CANNOT_FIND_ID_NEW,nodename,oldid,newid))
+		--end
 		
 	end
 	
 	function module:taketaxinode(wn)
 		flyend=0;
-		
+		--print(CalcFlId(wn));
 		dotracking = false;
 		--if(options.fasttrack) then
 			local numroutes = GetNumRoutes(wn);
@@ -193,61 +193,17 @@ function ns:initft()
 			
 			local aflidgen = true;
 			flight_route_accurate = '';
-			for i=1, numroutes do
-				if(i==1) then
-					sX = TaxiGetSrcX(wn, i);
-					sY = TaxiGetSrcY(wn, i);
-					flid = CalcFlId(sX,sY,module:getCurrentContinent())
+			
+					flid = CalcFlIdCurrent();
 					startname = FlightMapEnhanced_FlightNames[flid];
-					if(ns.flocn[flid] ~= nil) then
-						
-						local accuid = module:getid(flid);
-						if(accuid>-1) then
-							flight_route_accurate = module:getCurrentContinent().."-"..accuid;
-						else
-							
-							aflidgen = false;
-						end
-					else
-						--not having the flid so insert -1
-						aflidgen = false;
-						if(missingidshown==false) then
-							missingidshown = true;
-							module:printchangeid(flid,TaxiNodeName(wn));
-						end
-						
-						
-					end
-				end
-				
-				dX = TaxiGetDestX(wn, i);
-				dY = TaxiGetDestY(wn, i);
-				flid = CalcFlId(dX,dY,module:getCurrentContinent());
-				
-				--currently The Argent Vanguard flight path fucks, maybe more
-				if ns.flocn[flid] ~= nil then
+					flight_route_accurate = flid..'-';
 					
-					local accuid = module:getid(flid);
-					if(accuid>-1) then
-						flight_route_accurate = flight_route_accurate.."-"..accuid;
-					else
-						
-						aflidgen = false;
-					end
-					
-				else
-					if(missingidshown==false) then
-						missingidshown = true;
-						module:printchangeid(flid,TaxiNodeName(wn));
-					end
-					aflidgen = false;
-					
-				end
+			
 				
-				if(i==numroutes) then
+					flid = CalcFlId(wn);
 					endname = FlightMapEnhanced_FlightNames[flid]
-				end
-			end
+					flight_route_accurate = flight_route_accurate..flid;
+			
 				
 		if( aflidgen == true) then
 				
@@ -323,7 +279,7 @@ function ns:initft()
 		f:SetScript("OnEnter", function (self) GameTooltip:SetOwner(self, "ANCHOR_TOP");GameTooltip:SetText(L.FT_MOVE, nil, nil, nil, nil, 1); end);
 		f:SetScript("OnLeave",function() GameTooltip:Hide(); end); 
 		f:Hide();
-		hooksecurefunc('TaxiNodeOnButtonEnter',module.buildflyroutes);
+		--hooksecurefunc('TaxiNodeOnButtonEnter',module.buildflyroutes);
 		if not FlightMapEnhanced_Config.vconf.module.ft then FlightMapEnhanced_Config.vconf.module.ft = {}; end
 		options = FlightMapEnhanced_Config.vconf.module.ft;
 	end
@@ -369,7 +325,11 @@ function ns:initft()
 				local curcont,curmapid,curmaplevel,posX,posY = ns:GetPlayerData();
 				local closestfp = FlightMapEnhanced_GetClosestFlightPath(curcont,curmapid,posX,posY);	
 				--dirty hack for now to check if the flightmaster is the right one
+				--print("try to save");
+				--print(endname);
+				--print(closestfp.name);
 			if(closestfp.name and closestfp.name==endname ) then				
+			--print("saving");
 				local timetook = flyend - flystart;		
 				--print("saving accurate"..timetook);
 				s_f_times[flight_route_accurate] = timetook;
@@ -476,6 +436,7 @@ function ns:initft()
 	end
 	
 	function module:ShowFlightTime(ttime)
+		--print(flight_route_accurate);
 		if (recordingmode == true) then
 			displaytext = L.FT_RECORDING;			
 		else

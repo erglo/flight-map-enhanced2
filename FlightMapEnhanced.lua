@@ -47,6 +47,21 @@ function FlightMapEnhanced_OnLoad(self)
 	_G["FlightMapEnhancedTaxiChoiceCollapseOnShowText"]:SetText(L.ALWAYS_COLLAPSE);
 end
 
+
+StaticPopupDialogs["FLIGHTMAPENHANCED_DATAWIPE"] = {
+  text = [[|c0000FF00 Flight Map Enhanced |r |n This is a one time message, to inform that all data was wiped, flight times and also locations of the flightmasters, |n 
+		  |c00FF0000 Important |r Use that long World Map Click and Questfly with caution, since the missing location data. |n 
+          since I wrote the addon years ago, it wasnt possible to get unique id for them, this made me using an own one, which from time to time messed up due changes in the game, |n 
+		  as well based on flight master you know you were flying different paths, since an unknown location couldnt be even a hop.|n|n 
+		  Both 2 points changed and since it makes quite some stuff easier, I decided to adopt to the changes, while flight locations would be abled to be remapped with some work I decided to not do that extra work, since with some uploads it should be restored quick |n 
+		  flight times is kinda not really possible due how the system worked before and now.]],
+  button1 = "Ok",
+  timeout = 0,
+  whileDead = true,
+  hideOnEscape = true,
+  preferredIndex = 3,  
+}
+
 StaticPopupDialogs["FLIGHTMAPENHANCED_CONFIRMFLIGHT"] = {
   text = L.CONFIRM_FLIGHT,
   button1 = L.YES,
@@ -109,17 +124,17 @@ function ns:timer(seconds,command)
 	tinsert(activetimers,{["sleft"]=seconds,["command"] = command});
 end
 
-local function CalcFlId(x,y,z)
-	if(x<0) then
-		x=x*-1;
-	end
-	if(y<0) then
-		y=y*-1;
-	end
-	--print (tonumber(z..ceil(x*100)..ceil(y*100)));
-	return tonumber(z..ceil(x*100)..ceil(y*100));
+local function CalcFlId(slotIndex)
+	local taxiNodes = GetAllTaxiNodes();
+			for i, taxiNodeData in ipairs(taxiNodes) do
+				if(slotIndex == taxiNodeData.slotIndex) then
+					return taxiNodeData.nodeID;
+				end				
+			end	
 
 end
+
+
 
 local function CalcDist(x1,x2,y1,y2)
 	xd = x2-x1;
@@ -374,7 +389,7 @@ function FlightMapEnhanced_CreateFlyPathTable()
 				
 				local tx,ty = TaxiNodePosition(i);
 				
-				local flid = CalcFlId(tx,ty,curcont);
+				local flid = CalcFlId(i);
 				--print (flid)
 				--print (match1)
 				if(updatenames == true or true) then
@@ -406,24 +421,29 @@ function FlightMapEnhanced_CreateFlyPathTable()
 				--CalcFlId
 				ns.current = i;
 				local tx,ty = TaxiNodePosition(i);
-				local flid = CalcFlId(tx,ty,curcont);
+				local flid = CalcFlId(i);
 				if not(floc[curmapid][flid]) then
-					floc[curmapid][flid] = {};
-					floc[curmapid][flid].cont = curcont;
-					local x,y = GetPlayerMapPosition("player");
-					floc[curmapid][flid].x = ceil(x*1000)/1000;
-					floc[curmapid][flid].y = ceil(y*1000)/1000;
-					local curfaction = UnitFactionGroup("target");
-					if(curfaction == "Horde" or curfaction == "Alliance") then
-						floc[curmapid][flid]["faction"] = curfaction;
-					else
-						floc[curmapid][flid]["faction"] = "Neutral";
+					local _,_,_,x,y = ns:GetPlayerData();
+					if(x>0 and y>0) then
+						
+					
+						floc[curmapid][flid] = {};
+						floc[curmapid][flid].cont = curcont;
+						
+						floc[curmapid][flid].x = ceil(x*1000)/1000;
+						floc[curmapid][flid].y = ceil(y*1000)/1000;
+						local curfaction = UnitFactionGroup("target");
+						if(curfaction == "Horde" or curfaction == "Alliance") then
+							floc[curmapid][flid]["faction"] = curfaction;
+						else
+							floc[curmapid][flid]["faction"] = "Neutral";
+						end
+						--temporary add it also to the saved variables
+						if not(FlightMapEnhanced_FlightLocations[curmapid]) then
+							FlightMapEnhanced_FlightLocations[curmapid] = {};
+						end
+						FlightMapEnhanced_FlightLocations[curmapid][flid] = floc[curmapid][flid];
 					end
-					--temporary add it also to the saved variables
-					if not(FlightMapEnhanced_FlightLocations[curmapid]) then
-						FlightMapEnhanced_FlightLocations[curmapid] = {};
-					end
-					FlightMapEnhanced_FlightLocations[curmapid][flid] = floc[curmapid][flid];
 					-- removed due new optionprint("|c0000FF00Flight Map Enhanced|r:"..L.NEW_FLIGHT_PATH_DISCOVERED_HELP);
 					--temporary
 				end			
@@ -453,7 +473,7 @@ function FlightMapEnhanced_CreateFlyPathTable()
 				tmptaxinode[runs].isheader = false;
 				tmptaxinode[runs].flightid = val2;
 				local tx,ty = TaxiNodePosition(val2);
-				local flid = CalcFlId(tx,ty,curcont);
+				local flid = CalcFlId(val2);
 						
 				if (checkifdiscovered(flid)==true) then
 					tmptaxinode[runs].discovered = true;
@@ -812,20 +832,23 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 			ns:LoadModules();
 			
 			if not(FlightMapEnhanced_Config.vconf.version) then
-				ns:configchange(0,13);
-			elseif(FlightMapEnhanced_Config.vconf.version<13) then
-				ns:configchange(FlightMapEnhanced_Config.vconf.version,13);
+				ns:configchange(0,14);
+			elseif(FlightMapEnhanced_Config.vconf.version<14) then
+				ns:configchange(FlightMapEnhanced_Config.vconf.version,14);
 			end
 			ns.configchange = nil;
-			if(ns.gconf.version < 13) then
-				ns:gconfigchange(13);
+			if(ns.gconf.version < 14) then
+				ns:gconfigchange(14);
 			end
 			ns.gconfigchange = nil;
 			if not (ns.gconf.id) then
 				ns.gconf.id = UnitGUID("player");
 			end
 			ns.databroker = ldb:NewDataObject("Flight Map Enhanced", { type = "data source", label ="", text = "", icon = "Interface\\MINIMAP\\TRACKING\\FlightMaster", OnTooltipShow = function (self) self:AddLine(L.TOOLTIP_LINE2_MINIMAP) end, OnClick = ns.DataBrokerClick });
-		
+			if(not ns.gconf.datawipe) then
+				StaticPopup_Show ("FLIGHTMAPENHANCED_DATAWIPE");
+				ns.gconf.datawipe = 1;
+			end
 			collectgarbage();
 		end	
 	end
