@@ -1,4 +1,34 @@
 local ns = select( 2, ... );
+local printr_string="";
+local brokenIslesZones =  { GetMapZones(8) } ;
+StaticPopupDialogs["WorldMapDebug"] = {
+  text = printr_string,
+  button1 = "Ok",
+  timeout = 0,
+  whileDead = true,
+  hideOnEscape = true,
+  preferredIndex = 3,  
+}
+
+local function print_r (t, indent, done)
+  done = done or {}
+  indent = indent or ''
+  local nextIndent -- Storage for next indentation value
+  for key, value in pairs (t) do
+    if type (value) == "table" and not done [value] then
+      nextIndent = nextIndent or
+          (indent .. string.rep(' ',string.len(tostring (key))+2))
+          -- Shortcut conditional allocation
+      done [value] = true
+      printr_string=printr_string.. (indent .. "[" .. tostring (key) .. "] => Table {");
+      printr_string=printr_string..  (nextIndent .. "{");
+      print_r (value, nextIndent .. string.rep(' ',2), done)
+      printr_string=printr_string..(nextIndent .. "}");
+    else
+      printr_string = printr_string..  (indent .. "[" .. tostring (key) .. "] => " .. tostring (value).."")
+    end
+  end
+end
 function ns:initwmc()
 	ns.wmc = {};
 	local module = ns.wmc;
@@ -38,7 +68,67 @@ function ns:initwmc()
 	end
 	
 	function module:FlightTaken()
+		--print("hide");
 		minimappointer:Hide();
+		ns.DragonPins:RemoveMinimapIcon(self,minimappointer)
+	end
+	
+	function module:GetWorldQuestMapID(questID)
+		local index,value,worldQuests,i;
+		worldQuestPower = 0;
+		worldQuestPowerLooseSoon = 0;
+		local oldmapid = GetCurrentMapAreaID();
+		local oldlevel = GetCurrentMapDungeonLevel();
+		for index,value in pairs(brokenIslesZones) do			
+			if tonumber(value) ~= nil then
+				SetMapByID(value)
+				worldQuests = C_TaskQuest.GetQuestsForPlayerByMapID(value)
+				if worldQuests then					
+					for i = 1, #worldQuests do
+						
+						if worldQuests[i].questId == questID then
+							SetMapByID(oldmapid);
+							SetDungeonMapLevel(oldlevel);
+							return value;
+							
+						end						
+					end
+				end
+			end
+		end
+		SetMapByID(oldmapid);
+		SetDungeonMapLevel(oldlevel);
+		return nil;
+	end
+	
+	function module:GetClosestForWorldQuest(questID)
+
+				
+		local x, y = C_TaskQuest.GetQuestLocation (questID);
+		--print_r(parent);
+		--print(printr_string)
+		--StaticPopupDialogs["WorldMapDebug"].text = printr_string 
+		--StaticPopup_Show ("WorldMapDebug");
+		local mapID = module:GetWorldQuestMapID(questID);
+		if(mapID~=nil) then
+			local nextflight=FlightMapEnhanced_GetClosestFlightPath(8,mapID,x,y);		
+			
+			if(nextflight.name) then
+				FlightMapEnhanced_SetNextFly(nextflight.name);
+				if(FlightMapEnhanced_Config.vconf.module.wmc.minimap) then
+				
+					local curcont,curmapid,curmaplevel,posX,posY = ns:GetPlayerData();
+					local closestfp = FlightMapEnhanced_GetClosestFlightPath(curcont,curmapid,posX,posY);
+		
+				
+					if(closestfp.name) then
+						ns.DragonPins:AddMinimapIconMF(self,minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
+						minimappointer:Show();
+					end
+				end
+			end		
+		end
+		
 	end
 	
 	function module:GetClosestForQuest(questID)
@@ -48,6 +138,7 @@ function ns:initwmc()
 		--print (questLogIndex);
 		local distSqr, onContinent = GetDistanceSqToQuest(questLogIndex);
 		--print(distSqr);
+		
 		if(onContinent == false) then return end
 		--local questID, title, _, numObjectives, requiredMoney, isComplete, startEvent, isAutoComplete, failureTime, timeElapsed, questType, isTask, isStory, isOnMap, hasLocalPOI = GetQuestWatchInfo(questLogIndex);
 		
@@ -72,7 +163,7 @@ function ns:initwmc()
 		
 				
 					if(closestfp.name) then
-						ns.DragonPins:AddMinimapIconMF(Minimap,minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
+						ns.DragonPins:AddMinimapIconMF(self,minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
 						minimappointer:Show();
 					end
 				end
@@ -83,6 +174,23 @@ function ns:initwmc()
 		end
 		
 		
+	end
+	
+	function module:WorldQuestFrameAdd()
+		local block = self.activeFrame;
+		local questID = block.TrackedQuest.questID;
+		local mapID = block.TrackedQuest.mapID;
+		local info = UIDropDownMenu_CreateInfo();
+		--print_r(block.TrackedQuest);
+		--print(printr_string)
+		info.notCheckable = 1;
+		info.text = L.WMC_SET_QUEST_FLY;
+		info.func = module.GetClosestForWorldQuest;
+		info.arg1 = questID;
+		
+		info.noClickSound = 1;
+		info.checked = false;
+		UIDropDownMenu_AddButton(info, UIDROPDOWN_MENU_LEVEL);
 	end
 	
 	function module:QuestFrameAdd()
@@ -104,7 +212,7 @@ function ns:initwmc()
 		
 				
 		if(closestfp.name) then
-			ns.DragonPins:AddMinimapIconMF(Minimap,minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
+			ns.DragonPins:AddMinimapIconMF(self,minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
 			minimappointer:Show();
 		end
 	end
@@ -130,7 +238,7 @@ function ns:initwmc()
 		
 				
 					if(closestfp.name) then
-						ns.DragonPins:AddMinimapIconMF(Minimap, minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
+						ns.DragonPins:AddMinimapIconMF(self, minimappointer, closestfp.mapid,curmaplevel, closestfp.x, closestfp.y, true );
 						minimappointer:Show();
 					end
 				end
@@ -263,6 +371,7 @@ function ns:initwmc()
 		questfly:SetChecked(FlightMapEnhanced_Config.vconf.module.wmc.questfly);
 		--QuestObjectiveTracker_OnOpenDropDown
 		hooksecurefunc("QuestObjectiveTracker_OnOpenDropDown",module.QuestFrameAdd);
+		hooksecurefunc("BonusObjectiveTracker_OnOpenDropDown",module.WorldQuestFrameAdd);
 		
 	end
 	

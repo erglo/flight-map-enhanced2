@@ -844,7 +844,7 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 			if not (ns.gconf.id) then
 				ns.gconf.id = UnitGUID("player");
 			end
-			ns.databroker = ldb:NewDataObject("Flight Map Enhanced", { type = "data source", label ="", text = "", icon = "Interface\\MINIMAP\\TRACKING\\FlightMaster", OnTooltipShow = function (self) self:AddLine(L.TOOLTIP_LINE2_MINIMAP) end, OnClick = ns.DataBrokerClick });
+			ns.databroker = ldb:NewDataObject("Flight Map Enhanced", { type = "data source", label ="Flight Map Enhanced", text = "", icon = "Interface\\MINIMAP\\TRACKING\\FlightMaster", OnTooltipShow = function (self) self:AddLine(L.TOOLTIP_LINE2_MINIMAP) end, OnClick = ns.DataBrokerClick });
 			if(not ns.gconf.datawipe) then
 				StaticPopup_Show ("FLIGHTMAPENHANCED_DATAWIPE");
 				ns.gconf.datawipe = 1;

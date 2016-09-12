@@ -407,7 +407,7 @@ end
 			end
 			local minutes,seconds = module:CalcTime(floor(timeleft));
 			module.tframe.timeleft:SetText("|cFFFFFFFF"..displaytext..": |r"..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT);
-			ns.databroker.text = datacolor..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT;
+			ns.databroker.text = endname..": "..datacolor..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT;
 			lasttimer = 0;
 		end
 	end
@@ -415,7 +415,7 @@ end
 	function module:FlightTimerOff()
 		module.tframe:SetScript("OnUpdate",nil);
 		module.tframe:Hide();	
-		ns.databroker.label = "";
+		--ns.databroker.label = "";
 		ns.databroker.text = "";
 	end
 	
