@@ -1,7 +1,7 @@
 ## Interface: 70000
 ## Title: Flight Map Enhanced
 ## Author: Dorwido
-## Version: 2.0.3
+## Version: 2.1
 ## Notes: Enhances the normal Flight Map with adding a list to choose where you want to fly.
 ## SavedVariables: FlightMapEnhanced_FlightLocations, FlightMapEnhanced_FlightNames, FlightMapEnhanced_FlightTimes, FlightMapEnhanced_GlobalConf, FlightMapEnhanced_Uniquetest
 ## SavedVariablesPerCharacter: FlightMapEnhanced_Config
@@ -10,6 +10,10 @@ libs\CallbackHandler-1.0\CallbackHandler-1.0.xml
 libs\HereBeDragons-1.0\HereBeDragons-1.0.lua
 libs\HereBeDragons-1.0\HereBeDragons-Pins-1.0.lua
 libs\libdatabroker-1-1\LibDataBroker-1.1.lua
+libs\LibSharedMedia-3.0\lib.xml
+libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\AceConfig-3.0\AceConfig-3.0.xml
+libs\AceGUI-3.0-SharedMediaWidgets\widget.xml
 localisation\locale_enUS.lua
 localisation\locale_deDE.lua
 localisation\locale_frFR.lua

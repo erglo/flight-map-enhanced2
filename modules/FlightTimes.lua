@@ -1,4 +1,5 @@
 local ns = select( 2, ... );
+
 function ns:initft()
 	ns.ft = {};
 	local module = ns.ft;
@@ -16,6 +17,48 @@ function ns:initft()
 	local flystart = 0;
 	local flyend = 0;
 	local missingidshown = false;
+	local timerFrameValuesDefault = {
+		["statusBarChoice"] = "Blizzard Character Skills Bar",
+		["showTimer"] = true,
+		["fontColor"] = {
+			0.862745098039216, -- [1]
+			0.87843137254902, -- [2]
+			1, -- [3]
+			1, -- [4]
+		},
+		["colorRecording"] = {
+			1, -- [1]
+			0, -- [2]
+			0.125490196078431, -- [3]
+			0.689911127090454, -- [4]
+		},
+		["timerValue"] = true,
+		["fontChoice"] = "Skurri",
+		["showEndPoint"] = true,
+		["showStartPoint"] = true,
+		["borderChoice"] = "Blizzard Achievement Wood",
+		["backgroundChoice"] = "Blizzard Tabard Background",
+		["fontSize"] = 13,
+		["colorFlight"] = {
+			0.133333333333333, -- [1]
+			1, -- [2]
+			0.333333333333333, -- [3]
+			0.65430274605751, -- [4]
+		}
+	}
+	local timerConfig;
+	local metatable = {};
+	local timerFrame = CreateFrame("frame",nil,UIParent);
+	local media = LibStub("LibSharedMedia-3.0")	
+	local timerString1, timerString2, totalTime
+
+	metatable.__index = function( inTable, inKey )
+		value = defaultconf[inKey];
+		inTable[ inKey ] = value;
+		return value;
+	end
+
+
 
 	local function CalcFlId(slotIndex)
 		local taxiNodes = GetAllTaxiNodes();
@@ -224,7 +267,7 @@ end
 	function module:init()
 		--prehook so the flight path can be calculated before the flight start
 		if not(FlightMapEnhanced_FlightTimes) then FlightMapEnhanced_FlightTimes = {}; end
-		
+		config:init();
 		module:removefromsv();
 		s_f_times = FlightMapEnhanced_FlightTimes;
 		f_times = ns.ftracks;
@@ -391,7 +434,7 @@ end
 	end
 	
 	function module:UpdateTimer(elapsed)
-		
+		--print("update");
 		lasttimer = lasttimer + elapsed;
 		if(lasttimer>=0.5) then
 			local displaytext = '';
@@ -406,15 +449,21 @@ end
 				datacolor = "|cFFFF0000";
 			end
 			local minutes,seconds = module:CalcTime(floor(timeleft));
-			module.tframe.timeleft:SetText("|cFFFFFFFF"..displaytext..": |r"..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT);
+			if (recordingmode==false) then
+				local percent = 100-timeleft/totalTime * 100
+				timerFrame.statusBar:SetValue(percent);
+			end
+			timerString2 = " "..minutes..":"..seconds
+			timerFrame.statusBar.text:SetText(timerString1..timerString2);
+			--module.tframe.timeleft:SetText("|cFFFFFFFF"..displaytext..": |r"..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT);
 			ns.databroker.text = endname..": "..datacolor..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT;
 			lasttimer = 0;
 		end
 	end
 	
 	function module:FlightTimerOff()
-		module.tframe:SetScript("OnUpdate",nil);
-		module.tframe:Hide();	
+		timerFrame:SetScript("OnUpdate",nil);
+		timerFrame:Hide();	
 		--ns.databroker.label = "";
 		ns.databroker.text = "";
 	end
@@ -437,28 +486,262 @@ end
 	
 	function module:ShowFlightTime(ttime)
 		--print(flight_route_accurate);
+		if(timerConfig.showTimer == false) then 
+		
+		return 
+		end
+		totalTime = ttime;
+		module:BuildTimerStatusBar(startname,endname,ttime,recordingmode)
 		if (recordingmode == true) then
-			displaytext = L.FT_RECORDING;			
+			displaytext = L.FT_RECORDING;
+			timerFrame.statusBar:SetValue(100)			
 		else
-			displaytext = L.FT_TIME_LEFT;			
+			displaytext = L.FT_TIME_LEFT;	
+			timerFrame.statusBar:SetValue(0)			
 		end
 		timeleft = ttime;
-		module.tframe.flightpath:SetText("|cFFFFFFFF"..startname.."->"..endname);
-		ns.databroker.label = endname;
+		--module.tframe.flightpath:SetText("|cFFFFFFFF"..startname.."->"..endname);
+		--ns.databroker.label = endname;
 		local minutes,seconds=module:CalcTime(ttime);
-		module.tframe.timeleft:SetText("|cFFFFFFFF"..displaytext..": |r"..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT);
+		--module.tframe.timeleft:SetText("|cFFFFFFFF"..displaytext..": |r"..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT);
 		lasttimer = 0;
-		module.tframe:SetScript("OnUpdate",module.UpdateTimer);
-		module:SetTimerWidth();
+		timerFrame:SetScript("OnUpdate",module.UpdateTimer);
+		--module:SetTimerWidth();
 		if(options.points) then
-			module.tframe:SetPoint(unpack(options.points));
+			timerFrame:SetPoint(unpack(options.points));
 		else
-			module.tframe:SetPoint("CENTER",0,0);
+			timerFrame:SetPoint("CENTER",0,0);
 		end
-		module.tframe:Show();
+		timerFrame:Show();
 	end
 	
+	function config:init()
+		if not (FlightMapEnhanced_GlobalConf.timerFrameConfig) then
+			FlightMapEnhanced_GlobalConf.timerFrameConfig = {};
+			FlightMapEnhanced_GlobalConf.timerFrameConfig = timerFrameValuesDefault
+			setmetatable(FlightMapEnhanced_GlobalConf,metatable);
+			
+		end
+		timerConfig = FlightMapEnhanced_GlobalConf.timerFrameConfig
+	
+		config.name = "Flight Times";
+		config.parent = "Flight Map Enhanced";
 		
+		
+		
+		
+		local AceGUI = LibStub("AceGUI-3.0")	
+
+		local showTimer = AceGUI:Create("CheckBox")
+		showTimer.frame:SetParent(config);
+		showTimer:SetLabel(L.FT_SHOW_TIMER);
+		showTimer:SetPoint( "TOPLEFT", 16, -16);
+		showTimer:SetValue(timerConfig.showTimer)
+		showTimer.frame:Show(true)
+		showTimer:SetCallback("OnValueChanged",function(self,event,value)
+			showTimer:SetValue(value);
+			timerConfig.showTimer = value;		
+			end)
+
+		
+		local fontChoice = AceGUI:Create("LSM30_Font")
+		fontChoice.frame:SetParent(config);		
+		fontChoice:SetLabel(L.FT_FONT);
+		fontChoice:SetList(media:HashTable("font"))
+		fontChoice:SetPoint(  "TOP" , showTimer.frame,"BOTTOM",0,-5);
+		fontChoice:SetValue(timerConfig.fontChoice)
+		fontChoice:SetCallback("OnValueChanged",function(self,event,value)
+			fontChoice:SetValue(value);
+			timerConfig.fontChoice = value;		
+			end)
+		
+		local fontSize = AceGUI:Create("Slider")
+		fontSize.frame:SetParent(config);		
+		fontSize:SetLabel(L.FT_FONT_SIZE);
+		fontSize:SetPoint( "LEFT",fontChoice.frame,"RIGHT", 5, 0);	
+		fontSize:SetValue(timerConfig.fontSize)
+		fontSize:SetCallback("OnValueChanged",function(self,event,value)
+			fontSize:SetValue(value);
+			timerConfig.fontSize = value;		
+			end)
+		
+		local fontColor = AceGUI:Create("ColorPicker")
+		fontColor.frame:SetParent(config);
+		fontColor:SetLabel(L.FT_TEXT_COLOR);
+		fontColor:SetHasAlpha(true);
+		fontColor:SetPoint( "LEFT" , fontSize.frame,"RIGHT",5,0);
+		fontColor.frame:Show(true)
+		fontColor:SetColor(unpack(timerConfig.fontColor));
+		fontColor:SetCallback("OnValueConfirmed",function(self,event,r,g,b,a)
+			timerConfig.fontColor = {r,g,b,a}
+		end)
+		
+		local statusBarChoice = AceGUI:Create("LSM30_Statusbar")
+		statusBarChoice.frame:SetParent(config);		
+		statusBarChoice:SetLabel(L.FT_TEXTURE);
+		statusBarChoice:SetList(media:HashTable("statusbar"))
+		statusBarChoice:SetPoint( "TOP" , fontChoice.frame,"BOTTOM",0,-5);
+		statusBarChoice:SetValue(timerConfig.statusBarChoice)
+		statusBarChoice:SetCallback("OnValueChanged",function(self,event,value)
+			statusBarChoice:SetValue(value);
+			timerConfig.statusBarChoice = value;		
+			end)
+		
+		local backgroundChoice = AceGUI:Create("LSM30_Background")
+		backgroundChoice.frame:SetParent(config);		
+		backgroundChoice:SetLabel(L.FT_BACKGROUND);
+		backgroundChoice:SetList(media:HashTable("background"))
+		backgroundChoice:SetPoint( "LEFT" , statusBarChoice.frame,"RIGHT",5,0);
+		backgroundChoice:SetValue(timerConfig.backgroundChoice)
+		backgroundChoice:SetCallback("OnValueChanged",function(self,event,value)
+			backgroundChoice:SetValue(value);
+			timerConfig.backgroundChoice = value;		
+			end)
+		
+		
+		local borderChoice = AceGUI:Create("LSM30_Border")
+		borderChoice.frame:SetParent(config);		
+		borderChoice:SetLabel(L.FT_BORDER);
+		borderChoice:SetList(media:HashTable("border"))
+		borderChoice:SetPoint( "TOP" , statusBarChoice.frame,"BOTTOM",0,-5);
+		borderChoice:SetValue(timerConfig.borderChoice)
+		borderChoice:SetCallback("OnValueChanged",function(self,event,value)
+			borderChoice:SetValue(value);
+			timerConfig.borderChoice = value;		
+			end)
+		
+		local colorFlight = AceGUI:Create("ColorPicker")
+		colorFlight.frame:SetParent(config);
+		colorFlight:SetLabel(L.FT_COLOR);
+		colorFlight:SetHasAlpha(true);
+		colorFlight:SetPoint( "TOP" , borderChoice.frame,"BOTTOM",0,-5);
+		colorFlight.frame:Show(true)
+		colorFlight:SetColor(unpack(timerConfig.colorFlight));
+		colorFlight:SetCallback("OnValueConfirmed",function(self,event,r,g,b,a)
+			timerConfig.colorFlight = {r,g,b,a}
+		end)
+		
+		local colorRecording = AceGUI:Create("ColorPicker")
+		colorRecording.frame:SetParent(config);
+		colorRecording:SetLabel(L.FT_COLOR_RECORDING);
+		colorRecording:SetHasAlpha(true);
+		colorRecording:SetPoint( "LEFT" , colorFlight.frame,"RIGHT",0,0);
+		colorRecording.frame:Show(true)
+		colorRecording:SetColor(unpack(timerConfig.colorRecording));
+		colorRecording:SetCallback("OnValueConfirmed",function(self,event,r,g,b,a)
+			timerConfig.colorRecording = {r,g,b,a}
+		end)
+		
+		local showStartPoint = AceGUI:Create("CheckBox")
+		showStartPoint.frame:SetParent(config);
+		showStartPoint:SetLabel(L.FT_START_POINT);
+		showStartPoint:SetPoint( "TOP" , colorFlight.frame,"BOTTOM",0,-5);
+		showStartPoint.frame:Show(true)
+		showStartPoint:SetValue(timerConfig.showStartPoint)
+		
+		local showEndPoint = AceGUI:Create("CheckBox")
+		showEndPoint.frame:SetParent(config);
+		showEndPoint:SetLabel(L.FT_END_POINT);
+		showEndPoint:SetPoint( "LEFT" , showStartPoint.frame,"RIGHT",0,0);
+		showEndPoint.frame:Show(true)
+		showEndPoint:SetValue(timerConfig.showEndPoint)
+		
+		local timerValue = AceGUI:Create("CheckBox")
+		timerValue.frame:SetParent(config);
+		timerValue:SetLabel(L.FT_SHOW_TIME);
+		timerValue:SetPoint( "LEFT" , showEndPoint.frame,"RIGHT",0,0);
+		timerValue.frame:Show(true)
+		timerValue:SetValue(timerConfig.timerValue)
+		
+		--fa:Show(true);
+		 InterfaceOptions_AddCategory(config);
+		--print_r(fa);
+		--StaticPopupDialogs["WorldMaDebug"].text = printr_string 
+		--StaticPopup_Show ("WorldMaDebug");
+		
+		local timerStatusBar = CreateFrame("StatusBar",nil,timerFrame)
+				
+
+		
+		timerStatusBar:SetOrientation("HORIZONTAL")
+		timerStatusBar:SetMinMaxValues(0,100)
+		timerStatusBar:SetValue(50)
+		
+		timerStatusBar:SetPoint("CENTER",timerFrame,"CENTER",0,0);
+		timerStatusBar:Show(true)
+		timerStatusBar.text = timerStatusBar:CreateFontString(nil, "OVERLAY", "TextStatusBarText");		
+		timerStatusBar.text:SetPoint("CENTER",timerStatusBar,"CENTER",0,0);
+		
+		timerFrame:SetPoint("CENTER",UIParent,"CENTER",0,0);		
+		
+		timerFrame:Show(true)
+		timerFrame.statusBar = timerStatusBar;
+		
+		timerFrame.border = CreateFrame("Frame", nil, timerFrame.statusBar)
+		
+		timerFrame:RegisterForDrag("LeftButton");
+		timerFrame:SetMovable(true);
+		timerFrame:EnableMouse(true)
+		timerFrame:SetScript("OnDragStart", function(self) if IsShiftKeyDown() then self:StartMoving() end end)
+		timerFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing(); local a,b,c,d,e = self:GetPoint(); if(b~=nil) then b=b:GetName(); end; options.points = {a,b,c,d,e} end);
+		timerFrame:SetScript("OnEnter", function (self) GameTooltip:SetOwner(self, "ANCHOR_TOP");GameTooltip:SetText(L.FT_MOVE, nil, nil, nil, nil, 1); end);
+		timerFrame:SetScript("OnLeave",function() GameTooltip:Hide(); end); 
+		timerFrame:Hide();
+		
+		
+		--module:BuildTimerStatusBar("Start Point","End Point",300,true)
+	end
+	
+
+
+	
+	function module:BuildTimerStatusBar(startPoint,endPoint, timerValue, recording)
+		if timerConfig.showTimer == false then return end
+		timerString1=""
+		timerString2=""
+		local minute,second
+		if(timerConfig.showStartPoint) then
+			timerString1 = startPoint
+		end
+		if(timerConfig.showEndPoint) then
+			if timerString1 ~= "" then
+				timerString1 = timerString1 .. " > " .. endPoint
+			else
+				timerString1 = timerString1 .. endPoint
+			end
+		end
+		if(timerConfig.timerValue) then
+			minute,second = module:CalcTime(timerValue);			
+			timerString2 = " "..minute..":"..second
+		end
+		
+	    timerFrame.border:SetPoint("TOPLEFT", timerFrame.statusBar, "TOPLEFT", -5, 5)
+		timerFrame.border:SetPoint("BOTTOMRIGHT", timerFrame.statusBar, "BOTTOMRIGHT", 5, -5)
+		timerFrame.border:SetBackdrop({
+		edgeFile = media:Fetch("border",timerConfig.borderChoice),
+		bgFile= media:Fetch("background",timerConfig.backgroundChoice),
+		tile = false, tileSize = 0, edgeSize = 16, 
+		insets = { left = 0, right = 0, top = 0, bottom = 0}
+		})
+		timerFrame.border:SetFrameLevel(timerFrame.statusBar:GetFrameLevel())
+		local textWidth,textHeight;
+		timerFrame.statusBar.text:SetTextColor(unpack(timerConfig.fontColor))
+		timerFrame.statusBar.text:SetText(timerString1..timerString2)		
+		timerFrame.statusBar.text:SetFont(media:Fetch("font",timerConfig.fontChoice),timerConfig.fontSize)
+		textWidth = timerFrame.statusBar.text:GetWidth()
+		textHeight = timerFrame.statusBar.text:GetHeight()
+		timerFrame:SetWidth(textWidth+30)
+		timerFrame:SetHeight(textHeight+10)
+		timerFrame.statusBar:SetAllPoints();		
+		timerFrame.statusBar:SetValue(50)		
+		timerFrame.statusBar:SetStatusBarTexture(media:Fetch("statusbar",timerConfig.statusBarChoice))
+		if(recording == true) then
+			timerFrame.statusBar:SetStatusBarColor(unpack(timerConfig.colorRecording))
+		else
+			timerFrame.statusBar:SetStatusBarColor(unpack(timerConfig.colorFlight))
+		end
+		
+	end
 	
 	module:init();
 end
