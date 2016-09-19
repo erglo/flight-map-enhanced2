@@ -44,7 +44,9 @@ function ns:initft()
 			1, -- [2]
 			0.333333333333333, -- [3]
 			0.65430274605751, -- [4]
-		}
+		},
+		["depleteStatusBar"] = false,
+		["reverseStatusBar"] = false,
 	}
 	local timerConfig;
 	local metatable = {};
@@ -274,54 +276,7 @@ end
 		
 		module.frame = CreateFrame("Frame");
 		module.frame:SetScript("OnEvent",module.onevent);
-				
 		
-		local f = CreateFrame("Frame",nil,UIParent)
-		module.tframe = f;
-		f:SetFrameStrata("LOW")
-		
-		f:SetHeight(70) -- for your Texture
-		f:SetBackdrop( { 
-		  bgFile = "Interface\\Addons\\FlightMapEnhanced\\images\\ftimes_frame", 
-		
-		  insets = { left = 0, right = 0, top = 0, bottom = 0 }
-		});
-		
-		local t = f:CreateTexture(nil,"BACKGROUND")
-		t:SetTexture("Interface\\DialogFrame\\UI-DialogBox-Background-Dark")
-		
-		t:SetHeight(55);
-		
-		t:SetPoint("CENTER",f);
-		f.texture = t
-
-		local curwidth = 0;
-					
-		
-		local font1 = f:CreateFontString( nil, "OVERLAY", "GameFontNormalSmall" );
-		font1:SetPoint("TOPLEFT", f,"TOPLEFT", 14, -15)
-		
-		f.flightpath = font1;
-		
-		local font2 = f:CreateFontString( nil, "OVERLAY", "GameFontNormal" );
-		font2:SetPoint("TOPLEFT",font1,"TOPLEFT", 0, -20)
-		
-		font2:SetTextHeight(14);
-		f.timeleft = font2;
-		
-		local font3 = f:CreateFontString( nil, "OVERLAY", "GameFontNormalSmall" );
-		font3:SetPoint("TOPLEFT", font2,"TOPLEFT", 0, -25)
-		f.modus = font3;
-		
-	
-		f:RegisterForDrag("LeftButton");
-		f:SetMovable(true);
-		f:EnableMouse(true)
-		f:SetScript("OnDragStart", function(self) if IsShiftKeyDown() then self:StartMoving() end end)
-		f:SetScript("OnDragStop", function(self) self:StopMovingOrSizing(); local a,b,c,d,e = self:GetPoint(); if(b~=nil) then b=b:GetName(); end; options.points = {a,b,c,d,e} end);
-		f:SetScript("OnEnter", function (self) GameTooltip:SetOwner(self, "ANCHOR_TOP");GameTooltip:SetText(L.FT_MOVE, nil, nil, nil, nil, 1); end);
-		f:SetScript("OnLeave",function() GameTooltip:Hide(); end); 
-		f:Hide();
 		--hooksecurefunc('TaxiNodeOnButtonEnter',module.buildflyroutes);
 		if not FlightMapEnhanced_Config.vconf.module.ft then FlightMapEnhanced_Config.vconf.module.ft = {}; end
 		options = FlightMapEnhanced_Config.vconf.module.ft;
@@ -430,6 +385,7 @@ end
 	function module:CalcTime(seconds)
 		local minutes = floor(seconds/60);
 		local seconds = mod(seconds,60);
+		if(seconds < 10 ) then seconds = "0"..seconds end
 		return minutes,seconds;
 	end
 	
@@ -450,12 +406,17 @@ end
 			end
 			local minutes,seconds = module:CalcTime(floor(timeleft));
 			if (recordingmode==false) then
-				local percent = 100-timeleft/totalTime * 100
+				local percent
+				if timerConfig.depleteStatusBar == true then
+					percent = timeleft/totalTime * 100
+				else
+					percent = 100 - timeleft/totalTime * 100
+				end
 				timerFrame.statusBar:SetValue(percent);
 			end
 			timerString2 = " "..minutes..":"..seconds
 			timerFrame.statusBar.text:SetText(timerString1..timerString2);
-			--module.tframe.timeleft:SetText("|cFFFFFFFF"..displaytext..": |r"..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT);
+			
 			ns.databroker.text = endname..": "..datacolor..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT;
 			lasttimer = 0;
 		end
@@ -468,21 +429,7 @@ end
 		ns.databroker.text = "";
 	end
 	
-	function module:SetTimerWidth()
-		local curwidth = module.tframe.flightpath:GetWidth();
-		if(module.tframe.timeleft:GetWidth() > curwidth) then
-			curwidth = module.tframe.timeleft:GetWidth();
-		end
-		
-		if(module.tframe.modus:GetWidth() > curwidth) then
-			curwidth = module.tframe.modus:GetWidth();
-		end
-		
-		
-		module.tframe:SetWidth(curwidth+46);
-		module.tframe.texture:SetWidth(curwidth+30);
 	
-	end
 	
 	function module:ShowFlightTime(ttime)
 		--print(flight_route_accurate);
@@ -497,16 +444,20 @@ end
 			timerFrame.statusBar:SetValue(100)			
 		else
 			displaytext = L.FT_TIME_LEFT;	
-			timerFrame.statusBar:SetValue(0)			
+			if timerConfig.depleteStatusBar == true then
+				timerFrame.statusBar:SetValue(100)
+			else
+				timerFrame.statusBar:SetValue(0)
+			end
+						
 		end
 		timeleft = ttime;
-		--module.tframe.flightpath:SetText("|cFFFFFFFF"..startname.."->"..endname);
-		--ns.databroker.label = endname;
+	
 		local minutes,seconds=module:CalcTime(ttime);
-		--module.tframe.timeleft:SetText("|cFFFFFFFF"..displaytext..": |r"..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT);
+		
 		lasttimer = 0;
 		timerFrame:SetScript("OnUpdate",module.UpdateTimer);
-		--module:SetTimerWidth();
+		
 		if(options.points) then
 			timerFrame:SetPoint(unpack(options.points));
 		else
@@ -638,6 +589,10 @@ end
 		showStartPoint:SetPoint( "TOP" , colorFlight.frame,"BOTTOM",0,-5);
 		showStartPoint.frame:Show(true)
 		showStartPoint:SetValue(timerConfig.showStartPoint)
+		showStartPoint:SetCallback("OnValueChanged",function(self,event,value)
+			showStartPoint:SetValue(value);
+			timerConfig.showStartPoint = value;		
+			end)
 		
 		local showEndPoint = AceGUI:Create("CheckBox")
 		showEndPoint.frame:SetParent(config);
@@ -645,6 +600,10 @@ end
 		showEndPoint:SetPoint( "LEFT" , showStartPoint.frame,"RIGHT",0,0);
 		showEndPoint.frame:Show(true)
 		showEndPoint:SetValue(timerConfig.showEndPoint)
+		showEndPoint:SetCallback("OnValueChanged",function(self,event,value)
+			showEndPoint:SetValue(value);
+			timerConfig.showEndPoint = value;		
+			end)
 		
 		local timerValue = AceGUI:Create("CheckBox")
 		timerValue.frame:SetParent(config);
@@ -652,6 +611,36 @@ end
 		timerValue:SetPoint( "LEFT" , showEndPoint.frame,"RIGHT",0,0);
 		timerValue.frame:Show(true)
 		timerValue:SetValue(timerConfig.timerValue)
+		timerValue:SetCallback("OnValueChanged",function(self,event,value)
+			timerValue:SetValue(value);
+			timerConfig.timerValue = value;		
+			end)
+			
+			
+			
+		local depleteStatusBar = AceGUI:Create("CheckBox")
+		depleteStatusBar.frame:SetParent(config);
+		depleteStatusBar:SetLabel(L.FT_DEPLETE_BAR);
+		depleteStatusBar:SetPoint( "TOP" , showStartPoint.frame,"BOTTOM",0,-5);
+		depleteStatusBar.frame:Show(true)
+		--depleteStatusBar:SetWidth(250)
+		depleteStatusBar:SetValue(timerConfig.depleteStatusBar)
+		depleteStatusBar:SetCallback("OnValueChanged",function(self,event,value)
+			depleteStatusBar:SetValue(value);
+			timerConfig.depleteStatusBar = value;		
+			end)
+
+
+		local reverseStatusBar = AceGUI:Create("CheckBox")
+		reverseStatusBar.frame:SetParent(config);
+		reverseStatusBar:SetLabel(L.FT_REVERSE_BAR);
+		reverseStatusBar:SetPoint( "TOP" , depleteStatusBar.frame,"BOTTOM",0,-5);
+		reverseStatusBar.frame:Show(true)
+		reverseStatusBar:SetValue(timerConfig.reverseStatusBar)
+		reverseStatusBar:SetCallback("OnValueChanged",function(self,event,value)
+			reverseStatusBar:SetValue(value);
+			timerConfig.reverseStatusBar = value;		
+			end)
 		
 		--fa:Show(true);
 		 InterfaceOptions_AddCategory(config);
@@ -671,7 +660,7 @@ end
 		timerStatusBar:Show(true)
 		timerStatusBar.text = timerStatusBar:CreateFontString(nil, "OVERLAY", "TextStatusBarText");		
 		timerStatusBar.text:SetPoint("CENTER",timerStatusBar,"CENTER",0,0);
-		
+		--timerStatusBar:SetReverseFill(true); 
 		timerFrame:SetPoint("CENTER",UIParent,"CENTER",0,0);		
 		
 		timerFrame:Show(true)
@@ -686,10 +675,9 @@ end
 		timerFrame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing(); local a,b,c,d,e = self:GetPoint(); if(b~=nil) then b=b:GetName(); end; options.points = {a,b,c,d,e} end);
 		timerFrame:SetScript("OnEnter", function (self) GameTooltip:SetOwner(self, "ANCHOR_TOP");GameTooltip:SetText(L.FT_MOVE, nil, nil, nil, nil, 1); end);
 		timerFrame:SetScript("OnLeave",function() GameTooltip:Hide(); end); 
-		timerFrame:Hide();
+		timerFrame:Hide();	
 		
-		
-		--module:BuildTimerStatusBar("Start Point","End Point",300,true)
+	
 	end
 	
 
@@ -697,6 +685,11 @@ end
 	
 	function module:BuildTimerStatusBar(startPoint,endPoint, timerValue, recording)
 		if timerConfig.showTimer == false then return end
+		if timerConfig.reverseStatusBar == true then
+			timerFrame.statusBar:SetReverseFill(true); 
+		else
+			timerFrame.statusBar:SetReverseFill(false);
+		end
 		timerString1=""
 		timerString2=""
 		local minute,second
@@ -733,7 +726,8 @@ end
 		timerFrame:SetWidth(textWidth+30)
 		timerFrame:SetHeight(textHeight+10)
 		timerFrame.statusBar:SetAllPoints();		
-		timerFrame.statusBar:SetValue(50)		
+		
+		--timerFrame.statusBar:SetValue(50)		
 		timerFrame.statusBar:SetStatusBarTexture(media:Fetch("statusbar",timerConfig.statusBarChoice))
 		if(recording == true) then
 			timerFrame.statusBar:SetStatusBarColor(unpack(timerConfig.colorRecording))

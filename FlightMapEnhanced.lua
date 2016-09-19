@@ -849,7 +849,7 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 				StaticPopup_Show ("FLIGHTMAPENHANCED_DATAWIPE");
 				ns.gconf.datawipe = 1;
 			end
-			collectgarbage();
+			--collectgarbage();
 		end	
 	end
 end
@@ -948,7 +948,7 @@ TaxiFrame:SetScript("OnDragStop", function () TaxiFrame:StopMovingOrSizing();Fli
 
 function ns:LoadModules()
 	for key, val in pairs(ns.modules) do
-		if(FlightMapEnhanced_Config.vconf.modules[val]==1) then
+		if(FlightMapEnhanced_Config.vconf.modules[val]==1 or FlightMapEnhanced_Config.vconf.modules[val]==true) then
 			ns["init"..val]();
 		end
 		ns["init"..val] = nil;
