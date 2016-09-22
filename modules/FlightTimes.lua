@@ -330,6 +330,7 @@ end
 				--print(closestfp.name);
 			if(closestfp.name and closestfp.name==endname ) then				
 			--print("saving");
+				--print (flyend.."-"..flystart)
 				local timetook = flyend - flystart;		
 				--print("saving accurate"..timetook);
 				s_f_times[flight_route_accurate] = timetook;
@@ -348,10 +349,11 @@ end
 			self:RegisterEvent("UNIT_FLAGS");
 		elseif(event=="PLAYER_CONTROL_GAINED") then
 			--print("gelandet");
+			flyend = time();
 			module:FlightTimerOff()
 			module:timeroff();
 			module:delaytimer();
-			flyend = time();
+			
 			self:UnregisterEvent("PLAYER_CONTROL_GAINED");
 			
 			
