@@ -14,6 +14,7 @@ function ns:initft()
 	local remapid = {[45665]=45664,[76678]=76679}; --argent van guard --everbloom overlook
 	local options;
 	local dotracking;
+	local ticker;
 	local flystart = 0;
 	local flyend = 0;
 	local missingidshown = false;
@@ -277,6 +278,7 @@ end
 		module.frame = CreateFrame("Frame");
 		module.frame:SetScript("OnEvent",module.onevent);
 		
+		
 		--hooksecurefunc('TaxiNodeOnButtonEnter',module.buildflyroutes);
 		if not FlightMapEnhanced_Config.vconf.module.ft then FlightMapEnhanced_Config.vconf.module.ft = {}; end
 		options = FlightMapEnhanced_Config.vconf.module.ft;
@@ -286,12 +288,12 @@ end
 	
 	function module:delaytimer()
 		
-		module.frame:SetScript("OnUpdate",function (self,elapsed)
+		--module.frame:SetScript("OnUpdate",function (self,elapsed)
 				module:saveaccurate();
 				module.frame:UnregisterEvent("PLAYER_ENTERING_WORLD");
-				module.frame:SetScript("OnUpdate",nil);
+			--	module.frame:SetScript("OnUpdate",nil);
 			
-		end);
+		--end);
 	end
 	
 	function module:stoptracking()
@@ -305,8 +307,8 @@ end
 	end
 	
 	function module:timeroff()
-		
-		module.frame:SetScript("OnUpdate",nil);
+		ticker:Cancel();
+		--module.frame:SetScript("OnUpdate",nil);
 	end
 	
 
@@ -391,12 +393,13 @@ end
 	
 	function module:UpdateTimer(elapsed)
 		--print("update");
-		lasttimer = lasttimer + elapsed;
-		if(lasttimer>=0.5) then
+		--return;
+		
 			local displaytext = '';
 			local datacolor;
 			if (recordingmode==false) then
-				timeleft=timeleft-lasttimer;
+				timeleft=totalTime - (time()-flystart);
+				
 			    datacolor = "|cFF00FF00";
 				displaytext = L.FT_TIME_LEFT;
 			else
@@ -418,12 +421,13 @@ end
 			timerFrame.statusBar.text:SetText(timerString1..timerString2);
 			
 			ns.databroker.text = endname..": "..datacolor..minutes..L.FT_MINUTE_SHORT..seconds..L.FT_SECOND_SHORT;
-			lasttimer = 0;
-		end
+		
+		
 	end
 	
 	function module:FlightTimerOff()
-		timerFrame:SetScript("OnUpdate",nil);
+		--timerFrame:SetScript("OnUpdate",nil);
+		ticker:Cancel();
 		timerFrame:Hide();	
 		--ns.databroker.label = "";
 		ns.databroker.text = "";
@@ -456,8 +460,8 @@ end
 		local minutes,seconds=module:CalcTime(ttime);
 		
 		lasttimer = 0;
-		timerFrame:SetScript("OnUpdate",module.UpdateTimer);
-		
+		--timerFrame:SetScript("OnUpdate",module.UpdateTimer);
+		ticker = C_Timer.NewTicker(0.5, module.UpdateTimer)
 		if(options.points) then
 			timerFrame:SetPoint(unpack(options.points));
 		else

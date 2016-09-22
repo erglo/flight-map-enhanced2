@@ -23,6 +23,8 @@ function config:SetCurrentConfig()
 	config.LockAddonFrame:SetChecked(FlightMapEnhanced_Config.vconf.LockAddonFrame);
 	config.ConfirmFlyAuto:SetChecked(FlightMapEnhanced_Config.vconf.ConfirmFlyAuto);
 	config.ConfirmFlyManual:SetChecked(FlightMapEnhanced_Config.vconf.ConfirmFlyManual);
+	config.DontShowUpload:SetChecked(FlightMapEnhanced_Config.vconf.DontShowUpload);
+	--DontShowUpload
 end
 
 function config:ChangeState()
@@ -127,6 +129,15 @@ function config:Init()
 	ConfirmFlyManual:SetScript("onClick",config.ChangeState);
 	
 	_G[ ConfirmFlyManual:GetName().."Text" ]:SetText( L.CONFIG_CONFIRM_FLIGHT_MANUAL );
+	
+	
+	local DontShowUpload = CreateFrame( "CheckButton", "FlightMapEnhancedDontShowUpload", config, "InterfaceOptionsCheckButtonTemplate" );
+    config.DontShowUpload = DontShowUpload;
+	DontShowUpload.id = "DontShowUpload";
+	DontShowUpload:SetPoint( "TOPLEFT", ConfirmFlyManual, "BOTTOMLEFT", 0, -16);
+	DontShowUpload:SetScript("onClick",config.ChangeState);
+	
+	_G[ DontShowUpload:GetName().."Text" ]:SetText( L.CONFIG_DONT_SHOW_UPLOAD );
 
 	
 	
@@ -200,6 +211,9 @@ ModuleWarn:SetText("|c00dfb802"..L.CONFIG_MODULES_HELP_CAPTION.."|r|n"..L.CONFIG
  if not (FlightMapEnhanced_Config.vconf) then
    config:SetDefaultConfig();
  else
+	if(FlightMapEnhanced_Config.vconf.DontShowUpload == nil) then
+		FlightMapEnhanced_Config.vconf.DontShowUpload = false
+	end
    config:SetCurrentConfig();
  end
  ns.vconf = FlightMapEnhanced_Config.vconf;

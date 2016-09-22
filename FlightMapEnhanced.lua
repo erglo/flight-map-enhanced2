@@ -48,18 +48,29 @@ function FlightMapEnhanced_OnLoad(self)
 end
 
 
-StaticPopupDialogs["FLIGHTMAPENHANCED_DATAWIPE"] = {
-  text = [[|c0000FF00 Flight Map Enhanced |r |n This is a one time message, to inform that all data was wiped, flight times and also locations of the flightmasters, |n 
-		  |c00FF0000 Important |r Use that long World Map Click and Questfly with caution, since the missing location data. |n 
-          since I wrote the addon years ago, it wasnt possible to get unique id for them, this made me using an own one, which from time to time messed up due changes in the game, |n 
-		  as well based on flight master you know you were flying different paths, since an unknown location couldnt be even a hop.|n|n 
-		  Both 2 points changed and since it makes quite some stuff easier, I decided to adopt to the changes, while flight locations would be abled to be remapped with some work I decided to not do that extra work, since with some uploads it should be restored quick |n 
-		  flight times is kinda not really possible due how the system worked before and now.]],
+
+
+StaticPopupDialogs["FLIGHTMAPENHANCED_UPLOAD_TIMES"] = {
+ text = "|c0000FF00 Flight Map Enhanced |r|n"..L.NEW_FLIGHT_PATH_DISCOVERED_HELP.."|n"..L.NEW_FLIGHT_PATH_DISCOVERED_HELP_2,
   button1 = "Ok",
   timeout = 0,
   whileDead = true,
   hideOnEscape = true,
   preferredIndex = 3,  
+  OnShow = function (self, data)
+    self.editBox:SetText("http://wido.io/wow/addons/flight-map-enhanced-times/upload/")
+	self.editBox:HighlightText();
+end,
+  Onclick = function (self, data)
+    
+	self.editBox:HighlightText();
+end,
+OnAccept = function (self, data, data2)
+    local text = self.editBox:GetText()
+	self.editBox:HighlightText();
+    -- do whatever you want with it
+end,
+hasEditBox = true
 }
 
 StaticPopupDialogs["FLIGHTMAPENHANCED_CONFIRMFLIGHT"] = {
@@ -352,13 +363,7 @@ function FlightMapEnhanced_CreateFlyPathTable()
 	local updatenames = false;
 	local updatediscovered = false;
 	
-	if(doreminder) then
-		if(tcount(FlightMapEnhanced_FlightTimes)>0 or tcount(FlightMapEnhanced_FlightLocations)>0) then
-			print("|c0000FF00Flight Map Enhanced|r:"..L.NEW_FLIGHT_PATH_DISCOVERED_HELP.."http://wido.io/wow/addons/flight-map-enhanced-times/upload/");
-			doreminder = false;
-			ns.gconf.lastcheck = time();
-		end	
-	end
+	
 	
 	--this need overwork due diff chars know diff locations
 	--workarround for now having a table which saves the number of flight points
@@ -743,7 +748,7 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 			else
 				
 				ns.gconf = FlightMapEnhanced_GlobalConf;
-				if(time()-ns.gconf.lastcheck>604800) then
+				if(time()-ns.gconf.lastcheck>1209600) then
 					doreminder = true;
 				end
 			end
@@ -845,11 +850,20 @@ function FlightMapEnhanced_OnEvent(self,event,...)
 				ns.gconf.id = UnitGUID("player");
 			end
 			ns.databroker = ldb:NewDataObject("Flight Map Enhanced", { type = "data source", label ="Flight Map Enhanced", text = "", icon = "Interface\\MINIMAP\\TRACKING\\FlightMaster", OnTooltipShow = function (self) self:AddLine(L.TOOLTIP_LINE2_MINIMAP) end, OnClick = ns.DataBrokerClick });
-			if(not ns.gconf.datawipe) then
-				StaticPopup_Show ("FLIGHTMAPENHANCED_DATAWIPE");
-				ns.gconf.datawipe = 1;
+			--if(not ns.gconf.datawipe) then
+			--	StaticPopup_Show ("FLIGHTMAPENHANCED_DATAWIPE");
+			--	ns.gconf.datawipe = 1;
+			--end
+			
+			if(doreminder and ns.vconf.DontShowUpload~=true) then
+				if(tcount(FlightMapEnhanced_FlightTimes)>0 or tcount(FlightMapEnhanced_FlightLocations)>0) then
+					--print("|c0000FF00Flight Map Enhanced|r:"..L.NEW_FLIGHT_PATH_DISCOVERED_HELP.."http://wido.io/wow/addons/flight-map-enhanced-times/upload/");
+					StaticPopup_Show("FLIGHTMAPENHANCED_UPLOAD_TIMES")
+					doreminder = false;
+					ns.gconf.lastcheck = time();
+				end	
 			end
-			--collectgarbage();
+			collectgarbage();
 		end	
 	end
 end
