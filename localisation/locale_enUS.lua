@@ -43,6 +43,7 @@ ns.L = {
 	FT_USE_ACCURATE_TRACK_EXPLAIN = "With this enabled every possible flight combination will be tracked, resulting in accurate times, but will take long to record all possible combination. This is due even flying the same flight path forth and back can be different and there are just alot of combinations.",
 	FT_INFO = "If you use both options if possible the accurate time will be shown otherwise the times from fast tracking.",
 	FT_MOVE = "Shift+Left click to move the window",
+	FT_FLASH_ICON = "Flash the WoW Icon in taskbar when landing and out of the game",
 	FT_MODUS = "Modus",
 	FT_TIME_LEFT = "Time left",
 	FT_RECORDING = "Recording",

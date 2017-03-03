@@ -18,6 +18,9 @@ FlightMapEnhanced_FlightNames = {};
 FlightMapEnhanced_Config = {};
 FlightMapEnhancedCFrame = {};
 local ldb =  LibStub:GetLibrary("LibDataBroker-1.1");
+
+
+
 function FlightMapEnhanced_OnLoad(self)
 	self:RegisterEvent("TAXIMAP_OPENED");
 	self:RegisterEvent("TAXIMAP_CLOSED");
@@ -45,6 +48,7 @@ function FlightMapEnhanced_OnLoad(self)
 		end
 	FlightMapEnhancedTaxiChoiceContainer.update = FlightMapEnhancedTaxiChoiceContainer_Update;
 	_G["FlightMapEnhancedTaxiChoiceCollapseOnShowText"]:SetText(L.ALWAYS_COLLAPSE);
+	
 end
 
 
@@ -568,7 +572,7 @@ function FlightMapEnhanced_GetClosestFlightPath_old(mapcont,mapareaid,coordx,coo
 					--print(ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y));
 					--old local dist = CalcDist(coordx,value.x,coordy,value.y);
 					--print (mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
-					local dist = ns.Dragon:GetZoneDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
+					local dist = ns.Dragon:GetZoneDistance(mapareaid,nil,coordx,coordy,index,nil,v2.x,v2.y);
 					--print ("c:"..closest);
 					--print ("-");
 					--print(dist);
@@ -599,7 +603,7 @@ function FlightMapEnhanced_SetClosestFlightMaster()
 end
 
 function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
-	
+	--print (mapcont.."|"..mapareaid.."|"..coordx.."|"..coordy)
 	--if not (floc[mapareaid]) then
 	--	print(L.NO_FLIGHT_LOCATIONS_KNOWN);
 	if(flocdis["count"][mapcont] == 0) then
@@ -607,6 +611,13 @@ function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
 	else
 		local closest = 100000;
 		local flyto={};
+		local floorIndex,floorMapIndex;
+		--work arround for dalaran in legion
+		if mapareaid == 1014 then
+			floorMapIndex = 10
+		else
+			floorMapIndex = 0
+		end
 		--old for index,value in pairs(floc[mapareaid]) do
 		for index,value in pairs(floc) do
 			for i2,v2 in pairs(value) do
@@ -614,15 +625,24 @@ function FlightMapEnhanced_GetClosestFlightPath(mapcont,mapareaid,coordx,coordy)
 					--print(ns.Astrolabe:ComputeDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y));
 					--old local dist = CalcDist(coordx,value.x,coordy,value.y);
 					--print (mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
-					local dist = ns.Dragon:GetZoneDistance(mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
+					if index == 1014 then
+						floorIndex = 10
+					else
+						floorIndex = 0
+					end
+					
+					local dist = ns.Dragon:GetZoneDistance(mapareaid,floorMapIndex,coordx,coordy,index,floorIndex,v2.x,v2.y);
 					--print ("c:"..closest);
 					--print ("-");
 					--print(dist);
+					if index == 1014 then
+						--print(dist)
+					end
 					if(dist==nil) then
 						--print (mapareaid,0,coordx,coordy,index,0,v2.x,v2.y);
 					
 					else
-					
+						
 						if(dist<closest) then
 							closest = dist;
 							flyto={["name"]=flocn[i2],["mapid"]=index,["x"]=v2.x,["y"]=v2.y,["dist"]=dist};

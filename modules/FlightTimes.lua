@@ -48,6 +48,7 @@ function ns:initft()
 		},
 		["depleteStatusBar"] = false,
 		["reverseStatusBar"] = false,
+		["flashIcon"] = true,
 	}
 	local timerConfig;
 	local metatable = {};
@@ -56,7 +57,7 @@ function ns:initft()
 	local timerString1, timerString2, totalTime
 
 	metatable.__index = function( inTable, inKey )
-		value = defaultconf[inKey];
+		value = timerFrameValuesDefault[inKey];
 		inTable[ inKey ] = value;
 		return value;
 	end
@@ -307,6 +308,9 @@ end
 	end
 	
 	function module:timeroff()
+		if (timerConfig.flashIcon == true) then
+			FlashClientIcon();
+		end
 		ticker:Cancel();
 		--module.frame:SetScript("OnUpdate",nil);
 	end
@@ -476,11 +480,11 @@ end
 		if not (FlightMapEnhanced_GlobalConf.timerFrameConfig) then
 			FlightMapEnhanced_GlobalConf.timerFrameConfig = {};
 			FlightMapEnhanced_GlobalConf.timerFrameConfig = timerFrameValuesDefault
-			setmetatable(FlightMapEnhanced_GlobalConf,metatable);
+			--setmetatable(FlightMapEnhanced_GlobalConf,metatable);
 			
 		end
 		timerConfig = FlightMapEnhanced_GlobalConf.timerFrameConfig
-	
+		setmetatable(timerConfig,metatable);
 		config.name = "Flight Times";
 		config.parent = "Flight Map Enhanced";
 		
@@ -646,6 +650,20 @@ end
 		reverseStatusBar:SetCallback("OnValueChanged",function(self,event,value)
 			reverseStatusBar:SetValue(value);
 			timerConfig.reverseStatusBar = value;		
+			end)
+			
+			
+		local flashIcon = AceGUI:Create("CheckBox")
+		flashIcon.frame:SetParent(config);
+		flashIcon:SetLabel(L.FT_FLASH_ICON);
+		flashIcon:SetWidth(600)
+		flashIcon:SetPoint(  "TOPLEFT" , reverseStatusBar.frame,"BOTTOMLEFT",0,0);
+		flashIcon:SetValue(timerConfig.flashIcon)
+		flashIcon.frame:Show(true)
+		
+		flashIcon:SetCallback("OnValueChanged",function(self,event,value)
+			flashIcon:SetValue(value);
+			timerConfig.flashIcon = value;		
 			end)
 		
 		--fa:Show(true);

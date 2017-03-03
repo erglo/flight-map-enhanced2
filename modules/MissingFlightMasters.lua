@@ -6,7 +6,7 @@ function ns:initmfm()
 	local L = ns.L;
 	local missing = {};
 	local missing_pointers = {};
-	local showconts = {[485]=4,[13]=1,[14]=2,[466]=3,[862]=6,[962]=7}
+	local showconts = {[485]=4,[13]=1,[14]=2,[466]=3,[862]=6,[962]=7,[1007]=8}
 	local current = 1;
 	
 
@@ -24,7 +24,7 @@ function ns:initmfm()
 		local dis = FlightMapEnhanced_Config.discovery;
 		local faction =  UnitFactionGroup("player");
 		local missingcont = false;
-		for i=1,7 do
+		for i=1,8 do
 			if i ~= 5 then
 				missing[i] = {};
 				if(ns.flocdis.count[i]==0) then
@@ -46,7 +46,11 @@ function ns:initmfm()
 						end
 						if(ns.flocdis.count[v2.cont]>0) then
 							--print(i2);
+							--if (v2.cont == 8) then
 							
+							
+							--	print(i2);
+						--	end
 							tinsert(missing[v2.cont][i],{["x"]=v2.x,["y"]=v2.y});
 						end
 						c=c+1;					
@@ -80,7 +84,9 @@ function ns:initmfm()
 	end
 	
 	function module:ShowContinent(w,s)
+	--print(w);
 		if not(missing[w]) then return end
+	--	print("odig");
 		for i,v in pairs(missing[w]) do
 			for i2,v2 in pairs(v) do
 				module:CreateIcon(current);
@@ -95,8 +101,9 @@ function ns:initmfm()
 	end
 	
 	function module:ShowZone(c,m)
-		
+		--print(c);
 		if not(missing[c][m]) then return end
+		--print("going");
 		for i,v in pairs(missing[c][m]) do
 			module:CreateIcon(current);
 			missing_pointers[current]:SetHeight(30);
@@ -110,7 +117,7 @@ function ns:initmfm()
 	function module:onevent(event,...)
 		if(event=="WORLD_MAP_UPDATE") then
 			local curcont = GetCurrentMapContinent(); 
-			
+			--todo set to 9 to show broken isle flight master, but before need to remove all class only flight masters
 			if(WorldMapFrame:IsVisible() and curcont~=-1 and curcont<8 and curcont~=5) then
 				module:hideall();
 				local curmapid = GetCurrentMapAreaID();
